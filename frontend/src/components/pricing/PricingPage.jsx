@@ -3,6 +3,11 @@
 import { useState } from 'react';
 import { Check, Star, TrendingUp, BarChart3, Zap, Crown, Shield } from 'lucide-react';
 
+/**
+ * PricingPage component with dark theme
+ * Displays subscription plans, features comparison, and pricing information
+ * @returns {JSX.Element} Pricing page component
+ */
 const PricingPage = () => {
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState('pro');
@@ -131,22 +136,22 @@ const PricingPage = () => {
   const getColorClasses = (color, selected = false) => {
     const colors = {
       blue: {
-        bg: selected ? 'bg-blue-50 border-blue-500' : 'bg-white border-gray-200',
+        bg: selected ? 'bg-gray-700 border-blue-500' : 'bg-gray-800 border-gray-700',
         button: 'bg-blue-600 hover:bg-blue-700 text-white',
-        text: 'text-blue-600',
-        icon: 'text-blue-600'
+        text: 'text-blue-400',
+        icon: 'text-blue-400'
       },
       green: {
-        bg: selected ? 'bg-green-50 border-green-500' : 'bg-white border-gray-200',
+        bg: selected ? 'bg-gray-700 border-green-500' : 'bg-gray-800 border-gray-700',
         button: 'bg-green-600 hover:bg-green-700 text-white',
-        text: 'text-green-600',
-        icon: 'text-green-600'
+        text: 'text-green-400',
+        icon: 'text-green-400'
       },
       purple: {
-        bg: selected ? 'bg-purple-50 border-purple-500' : 'bg-white border-gray-200',
+        bg: selected ? 'bg-gray-700 border-purple-500' : 'bg-gray-800 border-gray-700',
         button: 'bg-purple-600 hover:bg-purple-700 text-white',
-        text: 'text-purple-600',
-        icon: 'text-purple-600'
+        text: 'text-purple-400',
+        icon: 'text-purple-400'
       }
     };
     return colors[color];
@@ -159,14 +164,14 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Choose Your Trading Edge
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Get access to professional-grade market analysis tools, AI-powered predictions, 
             and real-time data across Indian, US, and Crypto markets.
           </p>
@@ -174,14 +179,14 @@ const PricingPage = () => {
 
         {/* Billing Toggle */}
         <div className="flex justify-center mb-12">
-          <div className="bg-white rounded-lg p-1 shadow-md">
+          <div className="bg-gray-800 rounded-lg p-1 shadow-lg border border-gray-700">
             <div className="flex space-x-1">
               <button
                 onClick={() => setBillingPeriod('monthly')}
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                   billingPeriod === 'monthly'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 Monthly
@@ -191,10 +196,10 @@ const PricingPage = () => {
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                   billingPeriod === 'yearly'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
-                Yearly <span className="text-green-600 ml-1">(Save up to 25%)</span>
+                Yearly <span className="text-green-400 ml-1">(Save up to 25%)</span>
               </button>
             </div>
           </div>
@@ -210,7 +215,7 @@ const PricingPage = () => {
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-lg border-2 p-8 transition-all duration-200 hover:shadow-lg ${colors.bg}`}
+                className={`relative rounded-lg border-2 p-8 transition-all duration-200 hover:shadow-xl ${colors.bg}`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -222,24 +227,24 @@ const PricingPage = () => {
                 )}
                 
                 <div className="text-center mb-6">
-                  <div className={`inline-flex p-3 rounded-full mb-4 ${plan.color === 'blue' ? 'bg-blue-100' : plan.color === 'green' ? 'bg-green-100' : 'bg-purple-100'}`}>
+                  <div className={`inline-flex p-3 rounded-full mb-4 ${plan.color === 'blue' ? 'bg-blue-500/20 border border-blue-500/30' : plan.color === 'green' ? 'bg-green-500/20 border border-green-500/30' : 'bg-purple-500/20 border border-purple-500/30'}`}>
                     <IconComponent className={`w-8 h-8 ${colors.icon}`} />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
-                  <p className="text-gray-600 mt-2">{plan.description}</p>
+                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                  <p className="text-gray-400 mt-2">{plan.description}</p>
                 </div>
 
                 <div className="text-center mb-6">
                   <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-4xl font-bold text-white">
                       ${plan.price[billingPeriod]}
                     </span>
-                    <span className="text-gray-600 ml-2">
+                    <span className="text-gray-400 ml-2">
                       /{billingPeriod === 'monthly' ? 'month' : 'year'}
                     </span>
                   </div>
                   {billingPeriod === 'yearly' && (
-                    <p className="text-green-600 text-sm mt-2">
+                    <p className="text-green-400 text-sm mt-2">
                       Save ${savings} per year
                     </p>
                   )}
@@ -248,8 +253,8 @@ const PricingPage = () => {
                 <div className="space-y-3 mb-8">
                   {plan.features.map((feature, index) => (
                     <div key={index} className="flex items-center">
-                      <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -266,52 +271,52 @@ const PricingPage = () => {
         </div>
 
         {/* Feature Comparison Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">Feature Comparison</h2>
-            <p className="text-gray-600 mt-1">Compare all features across our plans</p>
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-700">
+            <h2 className="text-2xl font-bold text-white">Feature Comparison</h2>
+            <p className="text-gray-400 mt-1">Compare all features across our plans</p>
           </div>
           
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-700">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Features</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-gray-900">Basic</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-gray-900">Professional</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-gray-900">Enterprise</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-white">Features</th>
+                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Basic</th>
+                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Professional</th>
+                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Enterprise</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-700">
                 {features.map((category, categoryIndex) => (
                   <>
-                    <tr key={`category-${categoryIndex}`} className="bg-gray-50">
+                    <tr key={`category-${categoryIndex}`} className="bg-gray-700/50">
                       <td colSpan={4} className="px-6 py-3">
-                        <h4 className="text-sm font-semibold text-gray-900">{category.category}</h4>
+                        <h4 className="text-sm font-semibold text-white">{category.category}</h4>
                       </td>
                     </tr>
                     {category.items.map((item, itemIndex) => (
                       <tr key={`item-${categoryIndex}-${itemIndex}`}>
-                        <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-300">{item.name}</td>
                         <td className="px-6 py-4 text-center">
                           {item.basic ? (
-                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                            <Check className="w-5 h-5 text-green-400 mx-auto" />
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-600">—</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-center">
                           {item.pro ? (
-                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                            <Check className="w-5 h-5 text-green-400 mx-auto" />
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-600">—</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-center">
                           {item.enterprise ? (
-                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                            <Check className="w-5 h-5 text-green-400 mx-auto" />
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-600">—</span>
                           )}
                         </td>
                       </tr>
@@ -324,28 +329,28 @@ const PricingPage = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16 bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+        <div className="mt-16 bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
+          <h2 className="text-2xl font-bold text-white mb-6">Frequently Asked Questions</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Can I upgrade or downgrade my plan?</h4>
-              <p className="text-gray-600 text-sm">Yes, you can change your plan at any time. Upgrades take effect immediately, while downgrades take effect at the next billing cycle.</p>
+              <h4 className="font-semibold text-white mb-2">Can I upgrade or downgrade my plan?</h4>
+              <p className="text-gray-400 text-sm">Yes, you can change your plan at any time. Upgrades take effect immediately, while downgrades take effect at the next billing cycle.</p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Is there a free trial?</h4>
-              <p className="text-gray-600 text-sm">Yes, we offer a 14-day free trial for all plans. No credit card required to start.</p>
+              <h4 className="font-semibold text-white mb-2">Is there a free trial?</h4>
+              <p className="text-gray-400 text-sm">Yes, we offer a 14-day free trial for all plans. No credit card required to start.</p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">What payment methods do you accept?</h4>
-              <p className="text-gray-600 text-sm">We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.</p>
+              <h4 className="font-semibold text-white mb-2">What payment methods do you accept?</h4>
+              <p className="text-gray-400 text-sm">We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.</p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">How accurate are the AI predictions?</h4>
-              <p className="text-gray-600 text-sm">Our AI models have an average accuracy of 75-85% for short-term predictions and 65-75% for long-term forecasts.</p>
+              <h4 className="font-semibold text-white mb-2">How accurate are the AI predictions?</h4>
+              <p className="text-gray-400 text-sm">Our AI models have an average accuracy of 75-85% for short-term predictions and 65-75% for long-term forecasts.</p>
             </div>
           </div>
         </div>

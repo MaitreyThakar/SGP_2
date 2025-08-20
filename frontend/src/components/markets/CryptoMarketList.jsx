@@ -5,6 +5,11 @@ import { Search, Filter, TrendingUp, TrendingDown, Bitcoin } from 'lucide-react'
 import StockCard from '../common/StockCard';
 import { LoadingCard } from '../common/Loading';
 
+/**
+ * Crypto Market List component with dark theme
+ * Displays cryptocurrencies with filtering and sorting capabilities
+ * @returns {JSX.Element} Crypto market assets list
+ */
 const CryptoMarketList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('marketCap');
@@ -150,16 +155,16 @@ const CryptoMarketList = () => {
   return (
     <div className="space-y-6">
       {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 h-5 w-5" />
             <input
               type="text"
               placeholder="Search cryptocurrencies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
           
@@ -167,7 +172,7 @@ const CryptoMarketList = () => {
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -179,7 +184,7 @@ const CryptoMarketList = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white"
             >
               <option value="marketCap">Market Cap</option>
               <option value="price">Price</option>
@@ -199,7 +204,7 @@ const CryptoMarketList = () => {
               <p className="text-sm font-medium text-purple-100 opacity-90">Total Market Cap</p>
               <p className="text-2xl font-bold text-white mt-1">$2.1T</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+2.15%</span>
             </div>
@@ -212,7 +217,7 @@ const CryptoMarketList = () => {
               <p className="text-sm font-medium text-amber-100 opacity-90">24h Volume</p>
               <p className="text-2xl font-bold text-white mt-1">$89.5B</p>
             </div>
-            <div className="flex items-center text-red-200">
+            <div className="flex items-center text-red-300">
               <TrendingDown className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">-5.23%</span>
             </div>
@@ -225,7 +230,7 @@ const CryptoMarketList = () => {
               <p className="text-sm font-medium text-indigo-100 opacity-90">BTC Dominance</p>
               <p className="text-2xl font-bold text-white mt-1">52.3%</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+0.8%</span>
             </div>
@@ -238,7 +243,7 @@ const CryptoMarketList = () => {
               <p className="text-sm font-medium text-rose-100 opacity-90">Fear & Greed</p>
               <p className="text-2xl font-bold text-white mt-1">74</p>
             </div>
-            <div className="text-emerald-300">
+            <div className="text-green-300">
               <span className="text-sm font-semibold">Greed</span>
             </div>
           </div>
@@ -246,36 +251,36 @@ const CryptoMarketList = () => {
       </div>
 
       {/* Market Status */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700 hover:shadow-xl transition-shadow duration-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-purple-100 rounded-full">
-              <Bitcoin className="h-8 w-8 text-purple-600" />
+            <div className="p-3 bg-purple-500/20 rounded-full border border-purple-500/30">
+              <Bitcoin className="h-8 w-8 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Cryptocurrency Market</h3>
-              <p className="text-sm text-gray-600">24/7 Global Trading</p>
+              <h3 className="text-lg font-bold text-white">Cryptocurrency Market</h3>
+              <p className="text-sm text-gray-400">24/7 Global Trading</p>
             </div>
           </div>
           <div className="text-right">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-emerald-600">Live Trading</span>
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-green-400">Live Trading</span>
             </div>
-            <p className="text-sm text-gray-500 mt-1">Real-time data</p>
+            <p className="text-sm text-gray-400 mt-1">Real-time data</p>
           </div>
         </div>
       </div>
 
       {/* Crypto List */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-white">
             Cryptocurrencies ({filteredCrypto.length})
           </h2>
-          <div className="flex items-center space-x-3 bg-purple-50 px-4 py-2 rounded-full">
-            <Bitcoin className="h-5 w-5 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-700">Digital Assets</span>
+          <div className="flex items-center space-x-3 bg-purple-500/20 px-4 py-2 rounded-full border border-purple-500/30">
+            <Bitcoin className="h-5 w-5 text-purple-400" />
+            <span className="text-sm font-semibold text-purple-400">Digital Assets</span>
           </div>
         </div>
         
@@ -288,21 +293,17 @@ const CryptoMarketList = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredCrypto.map((crypto) => (
-              <div key={crypto.symbol} className="relative">
-                <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-lg">
-                  #{crypto.rank}
-                </div>
-                <StockCard
-                  symbol={crypto.symbol}
-                  name={crypto.name}
-                  price={crypto.price}
-                  change={crypto.change}
-                  changePercent={crypto.changePercent}
-                  volume={crypto.volume}
-                  marketCap={crypto.marketCap}
-                  onClick={() => handleCryptoClick(crypto)}
-                />
-              </div>
+              <StockCard
+                key={crypto.symbol}
+                symbol={crypto.symbol}
+                name={crypto.name}
+                price={crypto.price}
+                change={crypto.change}
+                changePercent={crypto.changePercent}
+                volume={crypto.volume}
+                marketCap={crypto.marketCap}
+                onClick={() => handleCryptoClick(crypto)}
+              />
             ))}
           </div>
         )}

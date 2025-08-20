@@ -5,6 +5,11 @@ import { Search, Filter, TrendingUp, TrendingDown } from 'lucide-react';
 import StockCard from '../common/StockCard';
 import { LoadingCard } from '../common/Loading';
 
+/**
+ * US Market List component with dark theme
+ * Displays NYSE/NASDAQ stocks with filtering and sorting capabilities
+ * @returns {JSX.Element} US market stocks list
+ */
 const USMarketList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('marketCap');
@@ -141,16 +146,16 @@ const USMarketList = () => {
   return (
     <div className="space-y-6">
       {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-500 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-400 h-5 w-5" />
             <input
               type="text"
               placeholder="Search US stocks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
           
@@ -158,7 +163,7 @@ const USMarketList = () => {
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-700 text-white"
             >
               {sectors.map(sector => (
                 <option key={sector} value={sector}>
@@ -170,7 +175,7 @@ const USMarketList = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-700 text-white"
             >
               <option value="marketCap">Market Cap</option>
               <option value="price">Price</option>
@@ -202,7 +207,7 @@ const USMarketList = () => {
               <p className="text-sm font-medium text-blue-100 opacity-90">NASDAQ</p>
               <p className="text-2xl font-bold text-white mt-1">13,456.78</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+45.67 (0.34%)</span>
             </div>
@@ -215,7 +220,7 @@ const USMarketList = () => {
               <p className="text-sm font-medium text-slate-100 opacity-90">DOW JONES</p>
               <p className="text-2xl font-bold text-white mt-1">34,789.12</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+112.34 (0.32%)</span>
             </div>
@@ -224,31 +229,31 @@ const USMarketList = () => {
       </div>
 
       {/* Market Hours */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Market Status</h3>
-            <p className="text-sm text-gray-600">US Stock Market</p>
+            <h3 className="text-lg font-semibold text-white">Market Status</h3>
+            <p className="text-sm text-gray-400">US Stock Market</p>
           </div>
           <div className="text-right">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-600">Market Open</span>
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-green-400">Market Open</span>
             </div>
-            <p className="text-sm text-gray-500 mt-1">Closes in 3h 45m</p>
+            <p className="text-sm text-gray-400 mt-1">Closes in 3h 45m</p>
           </div>
         </div>
       </div>
 
       {/* Stocks List */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-white">
             US Stocks ({filteredStocks.length})
           </h2>
-          <div className="flex items-center space-x-3 bg-red-50 px-4 py-2 rounded-full">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm font-semibold text-red-700">NYSE/NASDAQ Listed</span>
+          <div className="flex items-center space-x-3 bg-red-500/20 px-4 py-2 rounded-full border border-red-500/30">
+            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+            <span className="text-sm font-semibold text-red-400">NYSE/NASDAQ Listed</span>
           </div>
         </div>
         

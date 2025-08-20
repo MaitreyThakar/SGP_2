@@ -15,6 +15,11 @@ import {
   ChevronDown
 } from 'lucide-react';
 
+/**
+ * Main navigation component with dark theme
+ * Features responsive design with mobile menu and markets dropdown
+ * @returns {JSX.Element} Navigation component
+ */
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMarketsDropdownOpen, setIsMarketsDropdownOpen] = useState(false);
@@ -48,13 +53,13 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-gray-900 shadow-lg border-b border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">FinPredict</span>
+              <TrendingUp className="h-8 w-8 text-blue-400" />
+              <span className="text-xl font-bold text-white">FinPredict</span>
             </Link>
           </div>
 
@@ -64,7 +69,7 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsMarketsDropdownOpen(!isMarketsDropdownOpen)}
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Markets</span>
@@ -72,20 +77,20 @@ const Navbar = () => {
               </button>
               
               {isMarketsDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
                   {marketLinks.map((market) => {
                     const IconComponent = market.icon;
                     return (
                       <Link
                         key={market.href}
                         href={market.href}
-                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors duration-200"
                         onClick={() => setIsMarketsDropdownOpen(false)}
                       >
                         <IconComponent className="h-5 w-5" />
                         <div>
                           <div className="font-medium">{market.label}</div>
-                          <div className="text-xs text-gray-500">{market.desc}</div>
+                          <div className="text-xs text-gray-400">{market.desc}</div>
                         </div>
                       </Link>
                     );
@@ -100,7 +105,7 @@ const Navbar = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
                 >
                   <IconComponent className="h-4 w-4" />
                   <span>{link.label}</span>
@@ -113,7 +118,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-blue-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             >
               {isMenuOpen ? (
                 <X className="block h-6 w-6" />
@@ -128,10 +133,10 @@ const Navbar = () => {
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-900 border-t border-gray-700">
             {/* Mobile Markets Section */}
             <div className="pt-2">
-              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Markets
               </div>
               {marketLinks.map((market) => {
@@ -140,13 +145,13 @@ const Navbar = () => {
                   <Link
                     key={market.href}
                     href={market.href}
-                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <IconComponent className="h-5 w-5" />
                     <div>
                       <div>{market.label}</div>
-                      <div className="text-xs text-gray-500">{market.desc}</div>
+                      <div className="text-xs text-gray-400">{market.desc}</div>
                     </div>
                   </Link>
                 );
@@ -159,7 +164,7 @@ const Navbar = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <IconComponent className="h-5 w-5" />

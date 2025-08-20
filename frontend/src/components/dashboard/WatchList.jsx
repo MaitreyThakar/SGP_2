@@ -67,17 +67,19 @@ const WatchList = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200">
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg border border-gray-700">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-700/50">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Your Watchlist</h2>
-            <p className="text-sm text-gray-600 mt-1">Track your favorite stocks and cryptocurrencies</p>
+            <h2 className="text-2xl font-bold text-white">Your Watchlist</h2>
+            <p className="text-sm text-gray-300 mt-1">Track your favorite stocks and cryptocurrencies</p>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">{watchlist.length} items</span>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded-md border border-blue-200 hover:bg-blue-50 transition-colors">
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-400 bg-gray-700/50 px-3 py-1 rounded-full">
+              {watchlist.length} items
+            </span>
+            <button className="text-blue-400 hover:text-blue-300 text-sm font-medium px-4 py-2 rounded-lg border border-blue-600/50 hover:bg-blue-600/10 transition-all duration-200">
               Manage List
             </button>
           </div>
@@ -86,9 +88,9 @@ const WatchList = () => {
       
       {/* Content */}
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
           {watchlist.map((stock) => (
-            <div key={stock.symbol} className="transform hover:scale-105 transition-transform duration-200">
+            <div key={stock.symbol} className="transform hover:scale-105 transition-all duration-300">
               <StockCard
                 symbol={stock.symbol}
                 name={stock.name}
@@ -105,11 +107,11 @@ const WatchList = () => {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-        <div className="flex justify-between items-center text-sm text-gray-600">
+      <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-700/50 rounded-b-xl">
+        <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Last updated: Just now</span>
-          <button className="text-blue-600 hover:text-blue-800 font-medium">
-            Add New Stock
+          <button className="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200">
+            Add New Stock +
           </button>
         </div>
       </div>

@@ -5,6 +5,11 @@ import { Search, Filter, TrendingUp, TrendingDown } from 'lucide-react';
 import StockCard from '../common/StockCard';
 import { LoadingCard } from '../common/Loading';
 
+/**
+ * Indian Market List component with dark theme
+ * Displays NSE/BSE stocks with filtering and sorting capabilities
+ * @returns {JSX.Element} Indian market stocks list
+ */
 const IndianMarketList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('marketCap');
@@ -141,16 +146,16 @@ const IndianMarketList = () => {
   return (
     <div className="space-y-6">
       {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
             <input
               type="text"
               placeholder="Search Indian stocks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
           
@@ -158,7 +163,7 @@ const IndianMarketList = () => {
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
             >
               {sectors.map(sector => (
                 <option key={sector} value={sector}>
@@ -170,7 +175,7 @@ const IndianMarketList = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+              className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
             >
               <option value="marketCap">Market Cap</option>
               <option value="price">Price</option>
@@ -189,7 +194,7 @@ const IndianMarketList = () => {
               <p className="text-sm font-medium text-blue-100 opacity-90">NIFTY 50</p>
               <p className="text-2xl font-bold text-white mt-1">18,245.30</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+125.45 (0.69%)</span>
             </div>
@@ -202,7 +207,7 @@ const IndianMarketList = () => {
               <p className="text-sm font-medium text-orange-100 opacity-90">SENSEX</p>
               <p className="text-2xl font-bold text-white mt-1">61,235.75</p>
             </div>
-            <div className="flex items-center text-emerald-300">
+            <div className="flex items-center text-green-300">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">+423.12 (0.70%)</span>
             </div>
@@ -215,7 +220,7 @@ const IndianMarketList = () => {
               <p className="text-sm font-medium text-emerald-100 opacity-90">BANK NIFTY</p>
               <p className="text-2xl font-bold text-white mt-1">43,567.89</p>
             </div>
-            <div className="flex items-center text-red-200">
+            <div className="flex items-center text-red-300">
               <TrendingDown className="h-5 w-5 mr-1" />
               <span className="text-sm font-semibold">-89.23 (-0.20%)</span>
             </div>
@@ -224,14 +229,14 @@ const IndianMarketList = () => {
       </div>
 
       {/* Stocks List */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-white">
             Indian Stocks ({filteredStocks.length})
           </h2>
-          <div className="flex items-center space-x-3 bg-blue-50 px-4 py-2 rounded-full">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-sm font-semibold text-blue-700">NSE/BSE Listed</span>
+          <div className="flex items-center space-x-3 bg-blue-500/20 px-4 py-2 rounded-full border border-blue-500/30">
+            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+            <span className="text-sm font-semibold text-blue-400">NSE/BSE Listed</span>
           </div>
         </div>
         

@@ -1,7 +1,19 @@
 'use client';
 
-import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Volume2, DollarSign } from 'lucide-react';
 
+/**
+ * StockCard component for displaying individual stock information
+ * @param {Object} props - Component props
+ * @param {string} props.symbol - Stock symbol
+ * @param {string} props.name - Stock name
+ * @param {number} props.price - Current stock price
+ * @param {number} props.change - Price change amount
+ * @param {number} props.changePercent - Price change percentage
+ * @param {number} props.volume - Trading volume
+ * @param {number} props.marketCap - Market capitalization
+ * @param {Function} props.onClick - Click handler function
+ */
 const StockCard = ({ 
   symbol, 
   name, 
@@ -9,65 +21,79 @@ const StockCard = ({
   change, 
   changePercent, 
   volume, 
-  marketCap,
+  marketCap, 
   onClick 
 }) => {
   const isPositive = change >= 0;
-
+  
+  // Format large numbers
   const formatNumber = (num) => {
-    if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
-    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
-    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
-    return num?.toFixed(2) || '0.00';
+    if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
+    if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+    if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+    if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+    return num.toString();
   };
 
   return (
     <div 
-      className="relative bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 cursor-pointer border border-gray-200 hover:border-blue-300 group"
+      className="bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-xl p-6 border border-gray-600/50 hover:border-gray-500/50 cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
       onClick={onClick}
     >
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-            {symbol}
-          </h3>
-          <p className="text-sm text-gray-600 truncate">{name}</p>
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-lg font-bold text-white">{symbol}</h3>
+          <p className="text-xs text-gray-400 line-clamp-2">{name}</p>
         </div>
-        <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
-          isPositive 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
-        }`}>
+        <div className={`p-2 rounded-lg ${isPositive ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
           {isPositive ? (
-            <ArrowUpIcon className="h-3 w-3" />
+            <TrendingUp className="h-4 w-4 text-green-400" />
           ) : (
-            <ArrowDownIcon className="h-3 w-3" />
+            <TrendingDown className="h-4 w-4 text-red-400" />
           )}
-          <span>{changePercent?.toFixed(2)}%</span>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex justify-between items-baseline">
-          <span className="text-2xl font-bold text-gray-900">
-            ${price?.toFixed(2)}
+      {/* Price */}
+      <div className="mb-4">
+        <p className="text-2xl font-bold text-white">
+          ${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+        <div className="flex items-center space-x-1 mt-1">
+          <span className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            {isPositive ? '+' : ''}{change.toFixed(2)}
           </span>
-          <span className={`text-sm font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {isPositive ? '+' : ''}${change?.toFixed(2)}
+          <span className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            ({isPositive ? '+' : ''}{changePercent.toFixed(2)}%)
           </span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Volume</p>
-            <p className="text-sm font-medium text-gray-900">{formatNumber(volume)}</p>
+      {/* Stats */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-2 text-gray-400">
+            <Volume2 className="h-4 w-4" />
+            <span>Volume</span>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Market Cap</p>
-            <p className="text-sm font-medium text-gray-900">${formatNumber(marketCap)}</p>
-          </div>
+          <span className="text-gray-300 font-medium">{formatNumber(volume)}</span>
         </div>
+        
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-2 text-gray-400">
+            <DollarSign className="h-4 w-4" />
+            <span>Market Cap</span>
+          </div>
+          <span className="text-gray-300 font-medium">${formatNumber(marketCap)}</span>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 pt-4 border-t border-gray-600/50">
+        <button className="w-full text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200">
+          View Details →
+        </button>
       </div>
     </div>
   );
