@@ -2,6 +2,8 @@ streamlit
 pandas
 numpy==1.23.5
 scikit-learn
+GoodleNews
 tensorflow # For Keras LSTM/RNN
 alpha_vantage
 matplotlib 
+

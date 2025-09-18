@@ -33,7 +33,7 @@ def get_stock_news_sentiment(query, days=7, max_results=20):
 
     return pd.DataFrame(data)
 
-# ===== MAIN SCRIPT ===== #
+# ===== MAIN NEWS SCRIPT ===== #
 if __name__ == "__main__":
     print("Global Stock Sentiment Scraper (India + US)")
     print("Examples: Reliance, NIFTY, TCS, AAPL, Tesla, Microsoft")
