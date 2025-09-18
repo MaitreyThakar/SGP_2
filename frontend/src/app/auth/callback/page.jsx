@@ -18,18 +18,19 @@ export default function AuthCallback() {
         
         if (error) {
           console.error('Auth callback error:', error)
-          router.push('/auth/login?error=callback_error')
+          router.push('/login?error=callback_error')
           return
         }
 
         if (data.session) {
-          router.push('/indian-market')
+          // Redirect to profile page after successful OAuth callback
+          router.push('/profile')
         } else {
-          router.push('/auth/login')
+          router.push('/login')
         }
       } catch (error) {
         console.error('Unexpected error:', error)
-        router.push('/auth/login?error=unexpected_error')
+        router.push('/login?error=unexpected_error')
       }
     }
 

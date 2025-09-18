@@ -47,7 +47,8 @@ const Login = () => {
       if (authError) {
         setError(authError.message);
       } else {
-        router.push('/indian-market');
+        // Redirect to profile page after successful login
+        router.push('/profile');
         router.refresh();
       }
     } catch (err) {
@@ -69,7 +70,8 @@ const Login = () => {
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/indian-market`
+          // Redirect to profile page after Google OAuth
+          redirectTo: `${window.location.origin}/profile`
         }
       });
 

@@ -1,202 +1,188 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
-import { 
-  TrendingUp, 
-  BarChart3, 
-  Globe, 
-  DollarSign, 
-  Bitcoin, 
-  User, 
-  Menu, 
-  X,
-  CreditCard,
-  ChevronDown,
-  UserCircle,
-  UserPlus,
-  LogOut
-} from 'lucide-react';
-import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase';
+import { 
+  Menu, 
+  X, 
+  TrendingUp, 
+  User, 
+  LogOut, 
+  BarChart3, 
+  DollarSign, 
+  Bitcoin,
+  CreditCard
+} from 'lucide-react';
 
 /**
- * Main navigation component with dark theme
- * Features responsive design with mobile menu and markets dropdown
- * @returns {JSX.Element} Navigation component
+ * Navbar component with authentication-aware navigation
+ * Shows different menu items based on user authentication status
+ * @returns {JSX.Element} Navigation bar component
  */
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMarketsDropdownOpen, setIsMarketsDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const dropdownRef = useRef(null);
-  const supabase = createClient();
   const router = useRouter();
+  const supabase = createClient();
 
-  // Check user session
+  /**
+   * Check user authentication status
+   */
   useEffect(() => {
     const getUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error getting session:', error);
-        setLoading(false);
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      setLoading(false);
     };
 
     getUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
+        setUser(session?.user || null);
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    return () => subscription?.unsubscribe();
+  }, [supabase]);
 
-  // Handle logout
+  /**
+   * Handle user logout
+   */
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push('/');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+    await supabase.auth.signOut();
+    router.push('/');
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsMarketsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const marketLinks = [
-    { href: '/indian-market', label: 'Indian Market', icon: TrendingUp, desc: 'NSE & BSE Stocks' },
-    { href: '/us-market', label: 'US Market', icon: Globe, desc: 'NYSE & NASDAQ' },
-    { href: '/crypto-market', label: 'Crypto Market', icon: Bitcoin, desc: 'Digital Assets' },
+  /**
+   * Navigation items for authenticated users
+   */
+  const authenticatedNavItems = [
+    {
+      id: 'indian-market',
+      name: 'Indian Market',
+      href: '/indian-market',
+      icon: BarChart3,
+      description: 'NSE & BSE stocks'
+    },
+    {
+      id: 'us-market',
+      name: 'US Market',
+      href: '/us-market',
+      icon: DollarSign,
+      description: 'NYSE & NASDAQ stocks'
+    },
+    {
+      id: 'crypto-market',
+      name: 'Crypto',
+      href: '/crypto-market',
+      icon: Bitcoin,
+      description: 'Cryptocurrency markets'
+    },
+    {
+      id: 'prediction',
+      name: 'Predictions',
+      href: '/prediction',
+      icon: TrendingUp,
+      description: 'AI-powered predictions'
+    }
   ];
 
-  const otherNavLinks = [
-    { href: '/prediction', label: 'Predictions', icon: DollarSign },
-    { href: '/pricing', label: 'Pricing', icon: CreditCard },
-    { href: '/profile', label: 'Profile', icon: User },
+  /**
+   * Navigation items for non-authenticated users
+   */
+  const publicNavItems = [
+    {
+      id: 'features',
+      name: 'Features',
+      href: '/#features',
+      description: 'Platform capabilities'
+    },
+    {
+      id: 'pricing',
+      name: 'Pricing',
+      href: '/pricing',
+      icon: CreditCard,
+      description: 'Choose your plan'
+    },
+    {
+      id: 'about',
+      name: 'About',
+      href: '/#about',
+      description: 'Learn more about us'
+    }
   ];
+
+  const currentNavItems = user ? authenticatedNavItems : publicNavItems;
 
   return (
-    <nav className="bg-gray-900 shadow-lg border-b border-gray-700 sticky top-0 z-50">
+    <nav className="bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-blue-400" />
+              <TrendingUp className="h-8 w-8 text-blue-500" />
               <span className="text-xl font-bold text-white">FinPredict</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {user && (
-              <>
-                {/* Markets Dropdown */}
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsMarketsDropdownOpen(!isMarketsDropdownOpen)}
-                    className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
-                  >
-                    <BarChart3 className="h-4 w-4" />
-                    <span>Markets</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isMarketsDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  
-                  {isMarketsDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
-                      {marketLinks.map((market) => {
-                        const IconComponent = market.icon;
-                        return (
-                          <Link
-                            key={market.href}
-                            href={market.href}
-                            className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors duration-200"
-                            onClick={() => setIsMarketsDropdownOpen(false)}
-                          >
-                            <IconComponent className="h-5 w-5" />
-                            <div>
-                              <div className="font-medium">{market.label}</div>
-                              <div className="text-xs text-gray-400">{market.desc}</div>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
+          <div className="hidden md:flex items-center space-x-8">
+            {currentNavItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors duration-200 group"
+                >
+                  {IconComponent && (
+                    <IconComponent className="h-4 w-4 group-hover:text-blue-400 transition-colors" />
                   )}
-                </div>
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
 
-                {otherNavLinks.map((link) => {
-                  const IconComponent = link.icon;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
-                    >
-                      <IconComponent className="h-4 w-4" />
-                      <span>{link.label}</span>
-                    </Link>
-                  );
-                })}
-              </>
-            )}
-
-            {/* Auth Buttons */}
+            {/* Authentication Actions */}
             {!loading && (
-              <div className="flex items-center space-x-2 ml-4">
+              <div className="flex items-center space-x-4 ml-8 border-l border-gray-700 pl-8">
                 {user ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-800 border border-gray-700">
-                      <UserCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-300 text-sm">
-                        {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                      </span>
-                    </div>
+                  <div className="flex items-center space-x-4">
+                    <Link
+                      href="/profile"
+                      className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+                    >
+                      <User className="h-5 w-5" />
+                      <span className="hidden lg:block">Profile</span>
+                    </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-red-400 hover:bg-gray-800 transition-colors duration-200"
-                      title="Sign out"
+                      className="flex items-center space-x-2 text-gray-300 hover:text-red-400 transition-colors"
                     >
-                      <LogOut className="h-4 w-4" />
-                      <span>Logout</span>
+                      <LogOut className="h-5 w-5" />
+                      <span className="hidden lg:block">Logout</span>
                     </button>
                   </div>
                 ) : (
-                  <>
+                  <div className="flex items-center space-x-4">
                     <Link
                       href="/login"
-                      className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
+                      className="text-gray-300 hover:text-white transition-colors"
                     >
-                      <UserCircle className="h-4 w-4" />
-                      <span>Sign In</span>
+                      Login
                     </Link>
                     <Link
                       href="/signup"
-                      className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                     >
-                      <UserPlus className="h-4 w-4" />
-                      <span>Sign Up</span>
+                      Sign Up
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             )}
@@ -205,102 +191,78 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-blue-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-300 hover:text-white focus:outline-none"
             >
-              {isMenuOpen ? (
-                <X className="block h-6 w-6" />
-              ) : (
-                <Menu className="block h-6 w-6" />
-              )}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-900 border-t border-gray-700">
-            {user && (
-              <>
-                {/* Mobile Markets Section */}
-                <div className="pt-2">
-                  <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Markets
+      {isOpen && (
+        <div className="md:hidden bg-gray-800 border-t border-gray-700">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {currentNavItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {IconComponent && <IconComponent className="h-5 w-5" />}
+                  <div>
+                    <div className="font-medium">{item.name}</div>
+                    {item.description && (
+                      <div className="text-sm text-gray-400">{item.description}</div>
+                    )}
                   </div>
-                  {marketLinks.map((market) => {
-                    const IconComponent = market.icon;
-                    return (
-                      <Link
-                        key={market.href}
-                        href={market.href}
-                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <IconComponent className="h-5 w-5" />
-                        <div>
-                          <div>{market.label}</div>
-                          <div className="text-xs text-gray-400">{market.desc}</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+                </Link>
+              );
+            })}
 
-                {otherNavLinks.map((link) => {
-                  const IconComponent = link.icon;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <IconComponent className="h-5 w-5" />
-                      <span>{link.label}</span>
-                    </Link>
-                  );
-                })}
-              </>
-            )}
-
-            {/* Mobile Auth Section */}
+            {/* Mobile Authentication Actions */}
             {!loading && (
-              <div className="border-t border-gray-700 pt-4">
+              <div className="border-t border-gray-700 pt-4 mt-4">
                 {user ? (
-                  <div className="px-3 py-2 space-y-3">
-                    <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800 rounded-md border border-gray-700">
-                      <UserCircle className="h-5 w-5 text-blue-400" />
-                      <span className="text-gray-300 text-sm">
-                        {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                      </span>
-                    </div>
+                  <div className="space-y-1">
+                    <Link
+                      href="/profile"
+                      className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User className="h-5 w-5" />
+                      <span>Profile</span>
+                    </Link>
                     <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-red-400 hover:bg-gray-800 transition-colors duration-200"
+                      onClick={() => {
+                        handleLogout();
+                        setIsOpen(false);
+                      }}
+                      className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-red-400 hover:bg-gray-700 rounded-md transition-colors w-full text-left"
                     >
                       <LogOut className="h-5 w-5" />
                       <span>Logout</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <Link
                       href="/login"
-                      className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-blue-400 hover:bg-gray-800 transition-colors duration-200"
-                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
                     >
-                      <UserCircle className="h-5 w-5" />
-                      <span>Sign In</span>
+                      Login
                     </Link>
                     <Link
                       href="/signup"
-                      className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
-                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
                     >
-                      <UserPlus className="h-5 w-5" />
-                      <span>Sign Up</span>
+                      Sign Up
                     </Link>
                   </div>
                 )}

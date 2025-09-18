@@ -3,39 +3,61 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import ProfileCompletion from "@/components/profile/ProfileCompletion";
 
 /**
- * ProtectedRoute component for route guarding with Supabase authentication.
- * Redirects to /login if user is not authenticated.
+ * ProtectedRoute component with profile completion check
  * @param {React.ReactNode} children - Protected content to render
+ * @param {boolean} requireCompleteProfile - Whether to require completed profile
  * @returns {JSX.Element} Protected route wrapper
  */
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, requireCompleteProfile = true }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const supabase = createClient();
+
+  /**
+   * Fetches user profile data
+   * @param {string} userId - User ID
+   */
+  const fetchProfile = async (userId) => {
+    try {
+      const response = await fetch('/api/profile');
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        setProfileData(result.data);
+        setShowProfileCompletion(!result.data.profile_completed && requireCompleteProfile);
+      } else {
+        setShowProfileCompletion(requireCompleteProfile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setShowProfileCompletion(requireCompleteProfile);
+    }
+  };
 
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        // Get current session from Supabase
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-
-        console.log("Auth check - Session:", !!session, "Error:", error); // Debug log
-
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log("Auth check - Session:", !!session, "Error:", error);
+        
         const authenticated = !!session && !error;
-
+        
         setIsAuthenticated(authenticated);
-        setIsLoading(false);
-
-        if (!authenticated) {
-          console.log("User not authenticated, redirecting to login"); // Debug log
+        
+        if (authenticated) {
+          await fetchProfile(session.user.id);
+        } else {
           router.replace("/login");
         }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error("Error checking authentication:", error);
         setIsAuthenticated(false);
@@ -44,28 +66,38 @@ export default function ProtectedRoute({ children }) {
       }
     };
 
-    // Check authentication on mount
     checkAuthentication();
-
-    // Listen for auth state changes
+    
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, !!session); // Debug log
-
+      console.log("Auth state changed:", event, !!session);
+      
       const authenticated = !!session;
       setIsAuthenticated(authenticated);
-      setIsLoading(false);
-
-      if (!authenticated && event === "SIGNED_OUT") {
+      
+      if (authenticated) {
+        await fetchProfile(session.user.id);
+      } else if (event === 'SIGNED_OUT') {
         router.replace("/login");
       }
+      
+      setIsLoading(false);
     });
-
+    
     return () => {
       subscription?.unsubscribe();
     };
-  }, [router, supabase]);
+  }, [router, supabase, requireCompleteProfile]);
+
+  /**
+   * Handles profile completion
+   * @param {Object} completedProfile - Completed profile data
+   */
+  const handleProfileComplete = (completedProfile) => {
+    setProfileData(completedProfile);
+    setShowProfileCompletion(false);
+  };
 
   // Show loading state while checking authentication
   if (isLoading || isAuthenticated === null) {
@@ -81,19 +113,16 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // Don't render children if not authenticated (redirect in progress)
+  // Don't render children if not authenticated
   if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
-        <div className="text-center">
-          <span className="text-lg font-semibold text-white">
-            Redirecting to login...
-          </span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  // User is authenticated, render protected content
+  // Show profile completion if required and not completed
+  if (showProfileCompletion) {
+    return <ProfileCompletion onComplete={handleProfileComplete} />;
+  }
+
+  // User is authenticated and profile is complete, render protected content
   return <>{children}</>;
 }

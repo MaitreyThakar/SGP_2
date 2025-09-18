@@ -108,7 +108,8 @@ const Signup = () => {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/indian-market`
+          // Redirect to profile page after Google OAuth signup
+          redirectTo: `${window.location.origin}/profile`
         }
       });
 

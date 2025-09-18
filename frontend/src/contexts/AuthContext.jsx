@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }) => {
         setLoading(false)
         
         if (event === 'SIGNED_IN') {
-          router.push('/indian-market')
+          // Redirect to profile page after sign in
+          router.push('/profile')
         }
       }
     )
@@ -48,47 +49,21 @@ export const AuthProvider = ({ children }) => {
     return () => subscription?.unsubscribe()
   }, [router])
 
-  const signUp = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    return { data, error }
-  }
-
-  const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { data, error }
-  }
-
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        // Redirect to profile page after Google OAuth
+        redirectTo: `${window.location.origin}/profile`
       }
     })
     return { data, error }
   }
 
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (!error) {
-      router.push('/')
-    }
-    return { error }
-  }
-
   const value = {
     user,
     loading,
-    signUp,
-    signIn,
     signInWithGoogle,
-    signOut,
   }
 
   return (

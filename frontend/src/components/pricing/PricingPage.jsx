@@ -1,374 +1,306 @@
-'use client';
+  'use client';
 
 import { useState } from 'react';
-import { Check, Star, TrendingUp, BarChart3, Zap, Crown, Shield } from 'lucide-react';
+import { Check, X, Star, TrendingUp, Shield, Zap } from 'lucide-react';
 
 /**
- * PricingPage component with dark theme
- * Displays subscription plans, features comparison, and pricing information
- * @returns {JSX.Element} Pricing page component
+ * PricingPage component with proper key props for list items
+ * Displays pricing plans for FinPredict trading tools and predictions
+ * @returns {JSX.Element} Pricing page component with subscription plans
  */
 const PricingPage = () => {
-  const [billingPeriod, setBillingPeriod] = useState('monthly');
-  const [selectedPlan, setSelectedPlan] = useState('pro');
+  const [isAnnual, setIsAnnual] = useState(false);
 
-  const plans = [
+  const pricingPlans = [
     {
-      id: 'basic',
-      name: 'Basic',
-      icon: BarChart3,
-      price: { monthly: 29, yearly: 290 },
-      description: 'Perfect for beginners getting started with market analysis',
+      id: 'free',
+      name: 'Free',
+      price: { monthly: 0, annual: 0 },
+      description: 'Perfect for beginners exploring the markets',
       features: [
-        'Real-time market data',
-        'Basic stock screening',
-        'Portfolio tracking',
-        'Email alerts',
-        'Indian market access',
-        'Basic charts and indicators',
-        'Community support'
+        'Basic market data',
+        'Limited predictions (5/month)',
+        'Community access',
+        'Basic charts',
+        'Email support'
       ],
       limitations: [
-        'Limited to 10 watchlist items',
-        'Basic prediction models',
-        '50 API calls per day'
+        'No real-time data',
+        'Limited API calls',
+        'No premium indicators'
       ],
       popular: false,
-      color: 'blue'
+      buttonText: 'Get Started',
+      buttonVariant: 'outline'
     },
     {
       id: 'pro',
-      name: 'Professional',
-      icon: TrendingUp,
-      price: { monthly: 79, yearly: 790 },
-      description: 'Advanced tools for serious traders and investors',
+      name: 'Pro',
+      price: { monthly: 29, annual: 290 },
+      description: 'Advanced tools for serious traders',
       features: [
-        'Everything in Basic',
-        'Advanced AI predictions',
-        'US & Crypto markets',
-        'Real-time alerts',
+        'Real-time market data',
+        'Unlimited AI predictions',
         'Advanced charting tools',
-        'Technical indicators (50+)',
-        'Portfolio optimization',
-        'Risk assessment',
+        'Portfolio tracking',
+        'Custom alerts',
         'Priority support',
-        'API access'
+        'Technical indicators',
+        'Multi-market access'
       ],
-      limitations: [
-        'Unlimited watchlist',
-        'Advanced prediction models',
-        '1000 API calls per day'
-      ],
+      limitations: [],
       popular: true,
-      color: 'green'
+      buttonText: 'Start Pro Trial',
+      buttonVariant: 'primary'
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
-      icon: Crown,
-      price: { monthly: 199, yearly: 1990 },
-      description: 'Complete solution for institutional traders and fund managers',
+      price: { monthly: 99, annual: 990 },
+      description: 'Professional-grade tools for institutions',
       features: [
-        'Everything in Professional',
-        'Institutional-grade data',
-        'Custom AI models',
+        'Everything in Pro',
+        'API access',
         'White-label solutions',
-        'Dedicated account manager',
         'Custom integrations',
+        'Dedicated account manager',
         'Advanced analytics',
-        'Multi-user access',
-        '24/7 phone support',
-        'SLA guarantee'
+        'Risk management tools',
+        'Institutional data feeds',
+        'Custom reporting'
       ],
-      limitations: [
-        'Unlimited everything',
-        'Custom prediction models',
-        'Unlimited API calls'
-      ],
+      limitations: [],
       popular: false,
-      color: 'purple'
+      buttonText: 'Contact Sales',
+      buttonVariant: 'outline'
     }
   ];
 
-  const features = [
+  const additionalFeatures = [
     {
-      category: 'Market Data',
-      items: [
-        { name: 'Real-time Indian stocks', basic: true, pro: true, enterprise: true },
-        { name: 'Real-time US stocks', basic: false, pro: true, enterprise: true },
-        { name: 'Real-time Crypto data', basic: false, pro: true, enterprise: true },
-        { name: 'Historical data (5+ years)', basic: true, pro: true, enterprise: true },
-        { name: 'Institutional-grade data', basic: false, pro: false, enterprise: true }
-      ]
+      id: 'ai-predictions',
+      icon: TrendingUp,
+      title: 'AI-Powered Predictions',
+      description: 'Machine learning algorithms analyze market patterns for accurate price forecasts'
     },
     {
-      category: 'AI Predictions',
-      items: [
-        { name: 'Basic price predictions', basic: true, pro: true, enterprise: true },
-        { name: 'Advanced ML models', basic: false, pro: true, enterprise: true },
-        { name: 'Custom AI models', basic: false, pro: false, enterprise: true },
-        { name: 'Sentiment analysis', basic: false, pro: true, enterprise: true },
-        { name: 'News impact analysis', basic: false, pro: true, enterprise: true }
-      ]
+      id: 'security',
+      icon: Shield,
+      title: 'Bank-Grade Security',
+      description: 'Your data is protected with enterprise-level security and encryption'
     },
     {
-      category: 'Tools & Analytics',
-      items: [
-        { name: 'Basic charting', basic: true, pro: true, enterprise: true },
-        { name: 'Advanced charting tools', basic: false, pro: true, enterprise: true },
-        { name: 'Technical indicators (50+)', basic: false, pro: true, enterprise: true },
-        { name: 'Portfolio optimization', basic: false, pro: true, enterprise: true },
-        { name: 'Risk management tools', basic: false, pro: true, enterprise: true }
-      ]
-    },
-    {
-      category: 'Support & Access',
-      items: [
-        { name: 'Community support', basic: true, pro: true, enterprise: true },
-        { name: 'Priority email support', basic: false, pro: true, enterprise: true },
-        { name: '24/7 phone support', basic: false, pro: false, enterprise: true },
-        { name: 'Dedicated account manager', basic: false, pro: false, enterprise: true },
-        { name: 'SLA guarantee', basic: false, pro: false, enterprise: true }
-      ]
+      id: 'real-time',
+      icon: Zap,
+      title: 'Real-Time Data',
+      description: 'Get instant market updates and execute trades with minimal latency'
     }
   ];
 
-  const getColorClasses = (color, selected = false) => {
-    const colors = {
-      blue: {
-        bg: selected ? 'bg-gray-700 border-blue-500' : 'bg-gray-800 border-gray-700',
-        button: 'bg-blue-600 hover:bg-blue-700 text-white',
-        text: 'text-blue-400',
-        icon: 'text-blue-400'
-      },
-      green: {
-        bg: selected ? 'bg-gray-700 border-green-500' : 'bg-gray-800 border-gray-700',
-        button: 'bg-green-600 hover:bg-green-700 text-white',
-        text: 'text-green-400',
-        icon: 'text-green-400'
-      },
-      purple: {
-        bg: selected ? 'bg-gray-700 border-purple-500' : 'bg-gray-800 border-gray-700',
-        button: 'bg-purple-600 hover:bg-purple-700 text-white',
-        text: 'text-purple-400',
-        icon: 'text-purple-400'
-      }
-    };
-    return colors[color];
-  };
+  const faqs = [
+    {
+      id: 'trial',
+      question: 'Do you offer a free trial?',
+      answer: 'Yes! We offer a 14-day free trial for the Pro plan with full access to all features.'
+    },
+    {
+      id: 'cancel',
+      question: 'Can I cancel anytime?',
+      answer: 'Absolutely. You can cancel your subscription at any time with no cancellation fees.'
+    },
+    {
+      id: 'data-sources',
+      question: 'What data sources do you use?',
+      answer: 'We aggregate data from multiple exchanges including NSE, BSE, NYSE, NASDAQ, and major crypto exchanges.'
+    },
+    {
+      id: 'support',
+      question: 'What kind of support do you provide?',
+      answer: 'We offer email support for all users, priority support for Pro users, and dedicated account management for Enterprise clients.'
+    }
+  ];
 
-  const calculateSavings = (plan) => {
-    const monthlyCost = plan.price.monthly * 12;
-    const yearlyCost = plan.price.yearly;
-    return monthlyCost - yearlyCost;
+  /**
+   * Handles plan selection and redirects to checkout
+   * @param {string} planId - Selected plan identifier
+   */
+  const handleSelectPlan = (planId) => {
+    // Implement plan selection logic
+    console.log(`Selected plan: ${planId}`);
+    // Redirect to checkout or subscription page
   };
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Choose Your Trading Edge
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            Choose Your Trading
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"> Edge</span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Get access to professional-grade market analysis tools, AI-powered predictions, 
-            and real-time data across Indian, US, and Crypto markets.
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            Unlock professional-grade market analysis and AI predictions with our flexible pricing plans
           </p>
-        </div>
 
-        {/* Billing Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-gray-800 rounded-lg p-1 shadow-lg border border-gray-700">
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                  billingPeriod === 'monthly'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white'
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center mb-12">
+            <span className={`mr-3 ${!isAnnual ? 'text-white' : 'text-gray-400'}`}>Monthly</span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isAnnual ? 'translate-x-6' : 'translate-x-1'
                 }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingPeriod('yearly')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                  billingPeriod === 'yearly'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                Yearly <span className="text-green-400 ml-1">(Save up to 25%)</span>
-              </button>
-            </div>
+              />
+            </button>
+            <span className={`ml-3 ${isAnnual ? 'text-white' : 'text-gray-400'}`}>
+              Annual
+              <span className="ml-1 text-green-400 text-sm">(Save 17%)</span>
+            </span>
           </div>
         </div>
+      </section>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan) => {
-            const IconComponent = plan.icon;
-            const colors = getColorClasses(plan.color, selectedPlan === plan.id);
-            const savings = calculateSavings(plan);
-            
-            return (
+      {/* Pricing Cards */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pricingPlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative rounded-lg border-2 p-8 transition-all duration-200 hover:shadow-xl ${colors.bg}`}
+                className={`relative bg-gray-800 rounded-2xl border transition-all duration-300 hover:scale-105 ${
+                  plan.popular
+                    ? 'border-blue-500 shadow-2xl shadow-blue-500/20'
+                    : 'border-gray-700 hover:border-gray-600'
+                }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-green-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center">
                       <Star className="w-4 h-4 mr-1" />
                       Most Popular
                     </div>
                   </div>
                 )}
-                
-                <div className="text-center mb-6">
-                  <div className={`inline-flex p-3 rounded-full mb-4 ${plan.color === 'blue' ? 'bg-blue-500/20 border border-blue-500/30' : plan.color === 'green' ? 'bg-green-500/20 border border-green-500/30' : 'bg-purple-500/20 border border-purple-500/30'}`}>
-                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                  <p className="text-gray-400 mt-2">{plan.description}</p>
-                </div>
 
-                <div className="text-center mb-6">
-                  <div className="flex items-baseline justify-center">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                  <p className="text-gray-400 mb-6">{plan.description}</p>
+
+                  <div className="mb-6">
                     <span className="text-4xl font-bold text-white">
-                      ${plan.price[billingPeriod]}
+                      ${isAnnual ? plan.price.annual : plan.price.monthly}
                     </span>
-                    <span className="text-gray-400 ml-2">
-                      /{billingPeriod === 'monthly' ? 'month' : 'year'}
-                    </span>
+                    {plan.price.monthly > 0 && (
+                      <span className="text-gray-400 ml-2">
+                        /{isAnnual ? 'year' : 'month'}
+                      </span>
+                    )}
                   </div>
-                  {billingPeriod === 'yearly' && (
-                    <p className="text-green-400 text-sm mt-2">
-                      Save ${savings} per year
-                    </p>
-                  )}
-                </div>
 
-                <div className="space-y-3 mb-8">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-center">
-                      <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      <span className="text-gray-300">{feature}</span>
-                    </div>
-                  ))}
-                </div>
+                  <button
+                    onClick={() => handleSelectPlan(plan.id)}
+                    className={`w-full py-3 px-6 rounded-lg font-medium transition-colors mb-8 ${
+                      plan.buttonVariant === 'primary'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-700 text-white hover:bg-gray-600 border border-gray-600'
+                    }`}
+                  >
+                    {plan.buttonText}
+                  </button>
 
-                <button
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className={`w-full py-3 px-6 rounded-md font-medium transition-colors ${colors.button}`}
-                >
-                  {selectedPlan === plan.id ? 'Current Plan' : 'Get Started'}
-                </button>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-white">Features included:</h4>
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, index) => (
+                        <li key={`${plan.id}-feature-${index}`} className="flex items-center text-gray-300">
+                          <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {plan.limitations.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="font-semibold text-gray-400 mb-3">Limitations:</h4>
+                        <ul className="space-y-2">
+                          {plan.limitations.map((limitation, index) => (
+                            <li key={`${plan.id}-limitation-${index}`} className="flex items-center text-gray-500">
+                              <X className="w-4 h-4 text-red-400 mr-3 flex-shrink-0" />
+                              {limitation}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Feature Comparison Table */}
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-700">
-            <h2 className="text-2xl font-bold text-white">Feature Comparison</h2>
-            <p className="text-gray-400 mt-1">Compare all features across our plans</p>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-white">Features</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Basic</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Professional</th>
-                  <th className="px-6 py-4 text-center text-sm font-medium text-white">Enterprise</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {features.map((category, categoryIndex) => (
-                  <>
-                    <tr key={`category-${categoryIndex}`} className="bg-gray-700/50">
-                      <td colSpan={4} className="px-6 py-3">
-                        <h4 className="text-sm font-semibold text-white">{category.category}</h4>
-                      </td>
-                    </tr>
-                    {category.items.map((item, itemIndex) => (
-                      <tr key={`item-${categoryIndex}-${itemIndex}`}>
-                        <td className="px-6 py-4 text-sm text-gray-300">{item.name}</td>
-                        <td className="px-6 py-4 text-center">
-                          {item.basic ? (
-                            <Check className="w-5 h-5 text-green-400 mx-auto" />
-                          ) : (
-                            <span className="text-gray-600">—</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {item.pro ? (
-                            <Check className="w-5 h-5 text-green-400 mx-auto" />
-                          ) : (
-                            <span className="text-gray-600">—</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {item.enterprise ? (
-                            <Check className="w-5 h-5 text-green-400 mx-auto" />
-                          ) : (
-                            <span className="text-gray-600">—</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </>
-                ))}
-              </tbody>
-            </table>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* FAQ Section */}
-        <div className="mt-16 bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-          <h2 className="text-2xl font-bold text-white mb-6">Frequently Asked Questions</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-semibold text-white mb-2">Can I upgrade or downgrade my plan?</h4>
-              <p className="text-gray-400 text-sm">Yes, you can change your plan at any time. Upgrades take effect immediately, while downgrades take effect at the next billing cycle.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-white mb-2">Is there a free trial?</h4>
-              <p className="text-gray-400 text-sm">Yes, we offer a 14-day free trial for all plans. No credit card required to start.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-white mb-2">What payment methods do you accept?</h4>
-              <p className="text-gray-400 text-sm">We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-white mb-2">How accurate are the AI predictions?</h4>
-              <p className="text-gray-400 text-sm">Our AI models have an average accuracy of 75-85% for short-term predictions and 65-75% for long-term forecasts.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="mt-16 text-center bg-gradient-to-r from-blue-600 to-green-600 rounded-lg p-12">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Start Trading Smarter?
+      {/* Additional Features */}
+      <section className="px-4 sm:px-6 lg:px-8 py-20 bg-gray-800/50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            Why Choose FinPredict?
           </h2>
-          <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of traders who use FinPredict to make informed investment decisions. 
-            Start your free trial today.
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {additionalFeatures.map((feature) => {
+              const IconComponent = feature.icon;
+              return (
+                <div key={feature.id} className="text-center">
+                  <div className="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                  <p className="text-gray-400">{feature.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="px-4 sm:px-6 lg:px-8 py-20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-6">
+            {faqs.map((faq) => (
+              <div key={faq.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
+                <p className="text-gray-400">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Transform Your Trading?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of traders who trust FinPredict for market analysis
           </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition-colors">
-            Start Free Trial
+          <button
+            onClick={() => handleSelectPlan('pro')}
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          >
+            Start Your Free Trial
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
