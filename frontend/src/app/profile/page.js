@@ -1,4 +1,6 @@
 import ProfilePage from '@/components/profile/ProfilePage';
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+
 
 export const metadata = {
   title: "User Profile - FinPredict",
@@ -6,5 +8,5 @@ export const metadata = {
 };
 
 export default function Profile() {
-  return <ProfilePage />;
+  return (<ProtectedRoute><ProfilePage /></ProtectedRoute>);
 }
