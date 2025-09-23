@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FinPredict Stock Market Analysis
+
+FinPredict is a comprehensive stock market analysis and prediction platform built with Next.js, JavaScript, and Tailwind CSS. It provides multi-market support, ML-powered price predictions, and a professional, responsive UI.
+
+## Features
+
+- **Multi-Market Support**: Analyze Indian (NSE/BSE), US (NYSE/NASDAQ), and Cryptocurrency markets.
+- **Price Prediction**: AI/ML-powered predictions for stocks and cryptocurrencies.
+- **Interactive Dashboard**: Real-time data visualization and analytics.
+- **Professional UI**: Modern, responsive design using Tailwind CSS.
+- **User Profiles**: Secure authentication and personalized trading preferences.
+- **Pricing Plans**: Flexible subscription options for traders and institutions.
+
+## Tech Stack
+
+- **Frontend**: Next.js (App Router), React (functional components, hooks), Tailwind CSS
+- **Backend**: Next.js API routes, Supabase (auth & database)
+- **Data Fetching**: SWR/React Query (recommended for caching and synchronization)
+- **Authentication**: Supabase Auth (email/password, Google OAuth)
+- **Database**: Supabase Postgres (user profiles, trading data)
+- **Performance**: Code splitting, lazy loading, Next.js Image optimization
+
+## Folder Structure
+
+```
+src/
+  components/
+    common/        # Shared UI (Navbar, Footer, etc.)
+    markets/       # Market-specific components
+    dashboard/     # Dashboard and analytics
+    prediction/    # Prediction tools
+    profile/       # User profile management
+  app/
+    api/           # Next.js API routes
+    ...            # App pages (pricing, login, signup, etc.)
+  lib/             # Supabase client setup
+```
+
+## Coding Guidelines
+
+- Use functional components and React hooks.
+- Compose reusable components and organize by feature.
+- Follow Next.js App Router conventions.
+- Use Tailwind CSS for all styling.
+- Add TypeScript-like JSDoc comments for documentation.
+- Implement error handling and loading states.
+- Use semantic HTML for accessibility.
+- Optimize images and assets with Next.js Image.
+- Use SWR/React Query for data fetching and caching.
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. **Set up environment variables:**
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+4. **Visit** [http://localhost:3000](http://localhost:3000) to explore the app.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API & Database
 
-## Learn More
+- All backend logic is handled via Next.js API routes (`/src/app/api/`).
+- Supabase is used for authentication and database (user profiles, trading data).
+- See [`src/lib/supabase.js`](src/lib/supabase.js) for client setup.
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Follow the code style and folder structure guidelines.
+- Add JSDoc comments to all components and functions.
+- Use Tailwind CSS for all UI work.
+- Submit PRs with clear descriptions and reference related issues.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
