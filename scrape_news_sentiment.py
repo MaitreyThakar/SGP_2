@@ -44,3 +44,6 @@ if __name__ == "__main__":
     if not df.empty:
         print("\nTop Sentiment Headlines:\n")
         print(df.to_string(index=False))
+        # Save to CSV for later analysis
+        df.to_csv(f"{keyword}_news_sentiment.csv", index=False)
+        print(f"\nSentiment data saved to {keyword}_news_sentiment.csv")
