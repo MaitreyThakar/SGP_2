@@ -94,9 +94,9 @@ const StockCard = ({
 
       {/* Footer */}
       <div className="mt-4 pt-4 border-t border-gray-600/50">
-        <button className="w-full text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200">
+        {/* <button className="w-full text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200">
           View Details →
-        </button>
+        </button> */}
       </div>
     </div>
   );
