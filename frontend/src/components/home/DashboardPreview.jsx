@@ -23,7 +23,7 @@ const DashboardPreview = () => {
           <div className="space-y-8">
             <DashboardStats />
             <MarketOverview />
-            <WatchList />
+            {/* <WatchList /> */}
             <StockWatchlistChart />
           </div>
         </div>

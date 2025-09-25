@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useMarketData, useStockHistory } from '@/hooks/useMarketData';
 import { 
   LineChart, 
   Line, 
@@ -10,104 +11,23 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChevronDown, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 
-// Sample historical data for stocks
-const stockHistoricalData = {
-  'RELIANCE': [
-    { date: 'Aug 1', price: 2420.50 },
-    { date: 'Aug 2', price: 2435.75 },
-    { date: 'Aug 3', price: 2445.20 },
-    { date: 'Aug 4', price: 2430.10 },
-    { date: 'Aug 5', price: 2440.60 },
-    { date: 'Aug 6', price: 2455.30 },
-    { date: 'Aug 7', price: 2462.15 },
-    { date: 'Aug 8', price: 2448.50 },
-    { date: 'Aug 9', price: 2456.75 }
-  ],
-  'TCS': [
-    { date: 'Aug 1', price: 3380.25 },
-    { date: 'Aug 2', price: 3395.50 },
-    { date: 'Aug 3', price: 3410.75 },
-    { date: 'Aug 4', price: 3400.30 },
-    { date: 'Aug 5', price: 3415.80 },
-    { date: 'Aug 6', price: 3425.60 },
-    { date: 'Aug 7', price: 3435.90 },
-    { date: 'Aug 8', price: 3415.40 },
-    { date: 'Aug 9', price: 3421.20 }
-  ],
-  'HDFC': [
-    { date: 'Aug 1', price: 1630.45 },
-    { date: 'Aug 2', price: 1640.20 },
-    { date: 'Aug 3', price: 1645.60 },
-    { date: 'Aug 4', price: 1638.75 },
-    { date: 'Aug 5', price: 1642.30 },
-    { date: 'Aug 6', price: 1650.15 },
-    { date: 'Aug 7', price: 1652.40 },
-    { date: 'Aug 8', price: 1648.60 },
-    { date: 'Aug 9', price: 1654.85 }
-  ],
-  'INFY': [
-    { date: 'Aug 1', price: 1750.30 },
-    { date: 'Aug 2', price: 1765.45 },
-    { date: 'Aug 3', price: 1770.80 },
-    { date: 'Aug 4', price: 1763.25 },
-    { date: 'Aug 5', price: 1772.50 },
-    { date: 'Aug 6', price: 1780.65 },
-    { date: 'Aug 7', price: 1785.20 },
-    { date: 'Aug 8', price: 1778.90 },
-    { date: 'Aug 9', price: 1789.40 }
-  ],
-  'AAPL': [
-    { date: 'Aug 1', price: 170.25 },
-    { date: 'Aug 2', price: 171.50 },
-    { date: 'Aug 3', price: 172.80 },
-    { date: 'Aug 4', price: 171.75 },
-    { date: 'Aug 5', price: 172.60 },
-    { date: 'Aug 6', price: 173.45 },
-    { date: 'Aug 7', price: 174.20 },
-    { date: 'Aug 8', price: 173.80 },
-    { date: 'Aug 9', price: 175.23 }
-  ],
-  'BTC': [
-    { date: 'Aug 1', price: 42100.75 },
-    { date: 'Aug 2', price: 42500.30 },
-    { date: 'Aug 3', price: 42800.45 },
-    { date: 'Aug 4', price: 42300.90 },
-    { date: 'Aug 5', price: 42700.25 },
-    { date: 'Aug 6', price: 43100.50 },
-    { date: 'Aug 7', price: 43250.75 },
-    { date: 'Aug 8', price: 43150.30 },
-    { date: 'Aug 9', price: 43567.89 }
-  ]
-};
-
-// List of stocks available in watchlist
-const watchlistStocks = [
-  { symbol: 'RELIANCE', name: 'Reliance Industries Ltd' },
-  { symbol: 'TCS', name: 'Tata Consultancy Services' },
-  { symbol: 'HDFC', name: 'HDFC Bank Limited' },
-  { symbol: 'INFY', name: 'Infosys Limited' },
-  { symbol: 'AAPL', name: 'Apple Inc.' },
-  { symbol: 'BTC', name: 'Bitcoin' }
-];
-
-/**
- * StockWatchlistChart component for displaying stock price trends
- * Shows historical price data for selected stocks from watchlist
- */
 const StockWatchlistChart = () => {
-  const [selectedStock, setSelectedStock] = useState('RELIANCE');
-  const [chartData, setChartData] = useState([]);
+  const { data: marketData, loading: marketLoading } = useMarketData();
+  const [selectedStock, setSelectedStock] = useState('AAPL');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  // Set the chart data when the selected stock changes
+  const { data: chartData, loading: chartLoading, source } = useStockHistory(selectedStock);
+  
+  const watchlistStocks = marketData?.watchlistStocks || [];
+
+  // Set default selected stock when data loads
   useEffect(() => {
-    const data = stockHistoricalData[selectedStock];
-    if (data) {
-      setChartData(data);
+    if (watchlistStocks.length > 0 && !watchlistStocks.find(s => s.symbol === selectedStock)) {
+      setSelectedStock(watchlistStocks[0].symbol);
     }
-  }, [selectedStock]);
+  }, [watchlistStocks, selectedStock]);
 
   // Calculate the price change and percentage
   const calculateChange = () => {
@@ -126,15 +46,45 @@ const StockWatchlistChart = () => {
 
   const { change, percentage } = calculateChange();
   const isPositive = parseFloat(change) >= 0;
-  const selectedStockName = watchlistStocks.find(stock => stock.symbol === selectedStock)?.name || selectedStock;
+  const selectedStockData = watchlistStocks.find(stock => stock.symbol === selectedStock);
+  const selectedStockName = selectedStockData?.name || selectedStock;
   const currentPrice = chartData.length > 0 ? chartData[chartData.length - 1].price : 0;
+
+  if (marketLoading) {
+    return (
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg border border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-700/50">
+          <h3 className="text-2xl font-bold text-white">Stock Price Trends</h3>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 text-blue-400 animate-spin mx-auto mb-4" />
+            <p className="text-gray-300">Loading stock data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg border border-gray-700">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-700/50">
-        <h3 className="text-2xl font-bold text-white">Stock Price Trends</h3>
-        <p className="text-sm text-gray-300 mt-1">Historical price performance from your watchlist</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-2xl font-bold text-white">Stock Price Trends</h3>
+            <p className="text-sm text-gray-300 mt-1">Historical price performance from your watchlist</p>
+          </div>
+          {source && (
+            <span className={`px-3 py-1 rounded-full text-xs ${
+              source === 'finnhub' 
+                ? 'bg-green-600/20 text-green-400' 
+                : 'bg-yellow-600/20 text-yellow-400'
+            }`}>
+              {source === 'finnhub' ? 'Live Data' : 'Demo Data'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Dropdown and Info */}
@@ -204,50 +154,59 @@ const StockWatchlistChart = () => {
       {/* Chart Section */}
       <div className="p-6">
         <div className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="date" 
-                stroke="#9ca3af" 
-                fontSize={12}
-                tick={{ fill: '#9ca3af' }}
-              />
-              <YAxis 
-                stroke="#9ca3af" 
-                fontSize={12}
-                tick={{ fill: '#9ca3af' }}
-                domain={['dataMin - 10', 'dataMax + 10']}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1f2937',
-                  border: '1px solid #374151',
-                  borderRadius: '12px',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-                  color: '#f3f4f6'
-                }}
-                labelStyle={{ color: '#e5e7eb', fontWeight: 'bold' }}
-                itemStyle={{ color: '#e5e7eb' }}
-              />
-              <Line
-                type="monotone"
-                dataKey="price"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                name={`${selectedStock} Price`}
-                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {chartLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 text-blue-400 animate-spin mx-auto mb-4" />
+                <p className="text-gray-300">Loading chart data...</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#9ca3af" 
+                  fontSize={12}
+                  tick={{ fill: '#9ca3af' }}
+                />
+                <YAxis 
+                  stroke="#9ca3af" 
+                  fontSize={12}
+                  tick={{ fill: '#9ca3af' }}
+                  domain={['dataMin - 10', 'dataMax + 10']}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+                    color: '#f3f4f6'
+                  }}
+                  labelStyle={{ color: '#e5e7eb', fontWeight: 'bold' }}
+                  itemStyle={{ color: '#e5e7eb' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  name={`${selectedStock} Price`}
+                  activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
       {/* Footer Info */}
       <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-700/50 rounded-b-xl">
         <div className="flex justify-between items-center text-sm text-gray-400">
-          <span>Data shown for the last 9 trading days</span>
+          <span>Data shown for the last 7 trading days</span>
           <button className="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200">
             View Detailed Analysis →
           </button>
