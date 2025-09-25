@@ -24,15 +24,18 @@ const StockCard = ({
   marketCap, 
   onClick 
 }) => {
-  const isPositive = change >= 0;
+  const isPositive = (change || 0) >= 0;
   
   // Format large numbers
   const formatNumber = (num) => {
-    if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
-    if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
-    if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
-    if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-    return num.toString();
+    if (!num || num === null || num === undefined || isNaN(num)) return '0';
+    
+    const numValue = parseFloat(num);
+    if (numValue >= 1e12) return (numValue / 1e12).toFixed(1) + 'T';
+    if (numValue >= 1e9) return (numValue / 1e9).toFixed(1) + 'B';
+    if (numValue >= 1e6) return (numValue / 1e6).toFixed(1) + 'M';
+    if (numValue >= 1e3) return (numValue / 1e3).toFixed(1) + 'K';
+    return numValue.toString();
   };
 
   return (
@@ -58,14 +61,14 @@ const StockCard = ({
       {/* Price */}
       <div className="mb-4">
         <p className="text-2xl font-bold text-white">
-          ${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${(price || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
         <div className="flex items-center space-x-1 mt-1">
           <span className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-            {isPositive ? '+' : ''}{change.toFixed(2)}
+            {isPositive ? '+' : ''}{(change || 0).toFixed(2)}
           </span>
           <span className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-            ({isPositive ? '+' : ''}{changePercent.toFixed(2)}%)
+            ({isPositive ? '+' : ''}{(changePercent || 0).toFixed(2)}%)
           </span>
         </div>
       </div>
