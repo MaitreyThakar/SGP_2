@@ -65,7 +65,9 @@ curl -X POST http://localhost:5000/api/predictions `
 | Utils | `d:\maitrey\SGP_2-main\utils.py` |
 | PredictionDashboard | `d:\maitrey\SGP_2-main\frontend\src\components\prediction\PredictionDashboard.jsx` |
 | API Hook | `d:\maitrey\SGP_2-main\frontend\src\hooks\usePredictions.js` |
+| Search Hook | `d:\maitrey\SGP_2-main\frontend\src\hooks\useStockSearch.js` |
 | API Proxy | `d:\maitrey\SGP_2-main\frontend\src\app\api\predictions\route.js` |
+| Search API | `d:\maitrey\SGP_2-main\frontend\src\app\api\search\route.js` |
 | Backend Config | `d:\maitrey\SGP_2-main\.env` |
 | Frontend Config | `d:\maitrey\SGP_2-main\frontend\.env.local` |
 
@@ -102,6 +104,17 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ---
 
 ## COMMON TASKS
+
+### Custom Stock Search & Training
+Navigate to `/prediction` page and click the search button:
+- **US Market**: Enter symbols like `AAPL`, `TSLA`, `NVDA`
+- **Crypto Market**: Enter with `-USD` suffix like `BTC-USD`, `ETH-USD`
+- **Indian Market**: Enter with `.NS` suffix like `RELIANCE.NS`, `TCS.NS`
+
+The system will:
+1. Search and validate the symbol
+2. Train an LSTM model (30-60 seconds)
+3. Generate AI-powered predictions
 
 ### Add New Stock
 Edit `models.py`:
@@ -164,9 +177,17 @@ Check browser console (F12) → Network tab:
 
 ## KEY HOOKS & FUNCTIONS
 
-**Frontend Hook (React):**
+**Prediction Hook (React):**
 ```javascript
 const { predictions, loading, error, refetch } = usePredictions('us', '7d');
+```
+
+**Search Hook (React):**
+```javascript
+const { 
+  searchSymbol, trainAndPredict, searchAndTrain,
+  searching, training, searchError, customPrediction 
+} = useStockSearch('us');
 ```
 
 **Backend Function (Python):**
@@ -193,7 +214,9 @@ prediction = get_predictions('AAPL', 'us', '7d')
 2. **ARCHITECTURE.md** - System design & flow
 3. **FULL_STACK_SUMMARY.md** - What was built
 4. **PROJECT_KINGDOM_MAP.md** - Component reference
-5. **README.md** - Project overview
+5. **CUSTOM_STOCK_SEARCH_GUIDE.md** - Custom search & LSTM training
+6. **CRYPTO_SEARCH_FEATURE.md** - Crypto search implementation
+7. **README.md** - Project overview
 
 ---
 
@@ -202,10 +225,11 @@ prediction = get_predictions('AAPL', 'us', '7d')
 1. ✅ Run both servers
 2. ✅ Visit http://localhost:3000/prediction
 3. ✅ Switch markets & test UI
-4. ✅ Check backend API calls
-5. ✅ Implement real ML models
-6. ✅ Add database integration
-7. ✅ Deploy to production
+4. ✅ Test custom stock search feature
+5. ✅ Train LSTM models for predictions
+6. ✅ Check backend API calls
+7. ✅ Add database integration
+8. ✅ Deploy to production
 
 ---
 
