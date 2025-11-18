@@ -1,19 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, TrendingUp, TrendingDown, Target, Calendar, BarChart3, Globe, DollarSign, Bitcoin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, TrendingUp, TrendingDown, Globe, DollarSign, Bitcoin, AlertCircle, RefreshCw, Loader } from 'lucide-react';
 import StockChart from '../common/StockChart';
+import { usePredictions, usePrediction } from '@/hooks/usePredictions';
 
 /**
  * PredictionDashboard component with dark theme
  * AI-powered price predictions with comprehensive analysis and visualization for multiple markets
+ * Integrates with Flask backend for real predictions
  * @returns {JSX.Element} Multi-market prediction dashboard component
  */
 const PredictionDashboard = () => {
-  const [selectedMarket, setSelectedMarket] = useState('us'); // 'indian', 'us', 'crypto'
+  const [selectedMarket, setSelectedMarket] = useState('us');
   const [selectedStock, setSelectedStock] = useState('AAPL');
   const [predictionPeriod, setPredictionPeriod] = useState('7d');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch predictions from backend
+  const { predictions: allPredictions, loading: predictionsLoading, error: predictionsError, refetch: refetchPredictions } = usePredictions(selectedMarket, predictionPeriod);
+  const { prediction: selectedPredictionData, loading: selectedLoading } = usePrediction(selectedStock, selectedMarket);
 
   // Market configurations
   const markets = {
@@ -22,265 +28,72 @@ const PredictionDashboard = () => {
       currency: '₹',
       icon: Globe,
       color: 'from-orange-600 to-orange-700',
-      accentColor: 'orange'
+      accentColor: 'orange',
+      defaultSymbol: 'RELIANCE.NS'
     },
     us: {
       name: 'US Stock Market',
       currency: '$',
       icon: DollarSign,
       color: 'from-blue-600 to-blue-700',
-      accentColor: 'blue'
+      accentColor: 'blue',
+      defaultSymbol: 'AAPL'
     },
     crypto: {
       name: 'Cryptocurrency Market',
       currency: '$',
       icon: Bitcoin,
       color: 'from-purple-600 to-purple-700',
-      accentColor: 'purple'
+      accentColor: 'purple',
+      defaultSymbol: 'BTC-USD'
     }
   };
 
-  // Indian Stock Market Predictions
-  const indianPredictions = [
-    {
-      symbol: 'RELIANCE',
-      name: 'Reliance Industries Ltd.',
-      currentPrice: 2456.75,
-      predictedPrice: 2589.30,
-      confidence: 76,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 81,
-      factors: ['Energy sector growth', 'Refining margins', 'Digital expansion'],
-      sector: 'Energy'
-    },
-    {
-      symbol: 'TCS',
-      name: 'Tata Consultancy Services Ltd.',
-      currentPrice: 3842.50,
-      predictedPrice: 4025.75,
-      confidence: 83,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 85,
-      factors: ['IT sector boom', 'Digital transformation', 'Strong Q4 results'],
-      sector: 'Information Technology'
-    },
-    {
-      symbol: 'HDFCBANK',
-      name: 'HDFC Bank Ltd.',
-      currentPrice: 1567.25,
-      predictedPrice: 1489.60,
-      confidence: 72,
-      timeframe: '7 days',
-      trend: 'bearish',
-      accuracy: 78,
-      factors: ['Banking sector concerns', 'NPA worries', 'Interest rate changes'],
-      sector: 'Banking'
-    },
-    {
-      symbol: 'INFY',
-      name: 'Infosys Ltd.',
-      currentPrice: 1456.80,
-      predictedPrice: 1523.45,
-      confidence: 79,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 82,
-      factors: ['AI adoption', 'Cloud services growth', 'Strong pipeline'],
-      sector: 'Information Technology'
-    },
-    {
-      symbol: 'ITC',
-      name: 'ITC Ltd.',
-      currentPrice: 412.30,
-      predictedPrice: 435.75,
-      confidence: 68,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 75,
-      factors: ['FMCG sector recovery', 'Rural demand', 'New product launches'],
-      sector: 'FMCG'
-    }
-  ];
-
-  // US Stock Market Predictions  
-  const usPredictions = [
-    {
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      currentPrice: 175.23,
-      predictedPrice: 185.67,
-      confidence: 78,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 82,
-      factors: ['Strong earnings', 'iPhone 15 launch', 'Services growth'],
-      sector: 'Technology'
-    },
-    {
-      symbol: 'TSLA',
-      name: 'Tesla Inc.',
-      currentPrice: 234.56,
-      predictedPrice: 218.90,
-      confidence: 65,
-      timeframe: '7 days',
-      trend: 'bearish',
-      accuracy: 75,
-      factors: ['EV market competition', 'Production challenges', 'Regulatory concerns'],
-      sector: 'Automotive'
-    },
-    {
-      symbol: 'MSFT',
-      name: 'Microsoft Corporation',
-      currentPrice: 342.67,
-      predictedPrice: 358.12,
-      confidence: 84,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 88,
-      factors: ['AI integration', 'Cloud dominance', 'Enterprise adoption'],
-      sector: 'Technology'
-    },
-    {
-      symbol: 'GOOGL',
-      name: 'Alphabet Inc.',
-      currentPrice: 138.45,
-      predictedPrice: 145.80,
-      confidence: 77,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 80,
-      factors: ['Search growth', 'AI advancements', 'Cloud expansion'],
-      sector: 'Technology'
-    },
-    {
-      symbol: 'AMZN',
-      name: 'Amazon.com Inc.',
-      currentPrice: 148.78,
-      predictedPrice: 156.90,
-      confidence: 73,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 79,
-      factors: ['E-commerce growth', 'AWS expansion', 'Prime membership'],
-      sector: 'E-commerce'
-    }
-  ];
-
-  // Cryptocurrency Market Predictions
-  const cryptoPredictions = [
-    {
-      symbol: 'BTC',
-      name: 'Bitcoin',
-      currentPrice: 43567.89,
-      predictedPrice: 47890.23,
-      confidence: 72,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 69,
-      factors: ['Institutional adoption', 'ETF approvals', 'Halving cycle'],
-      sector: 'Store of Value'
-    },
-    {
-      symbol: 'ETH',
-      name: 'Ethereum',
-      currentPrice: 2678.45,
-      predictedPrice: 2890.75,
-      confidence: 75,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 73,
-      factors: ['DeFi growth', 'Layer 2 adoption', 'Staking rewards'],
-      sector: 'Smart Contracts'
-    },
-    {
-      symbol: 'BNB',
-      name: 'BNB',
-      currentPrice: 298.76,
-      predictedPrice: 285.40,
-      confidence: 68,
-      timeframe: '7 days',
-      trend: 'bearish',
-      accuracy: 71,
-      factors: ['Exchange competition', 'Regulatory scrutiny', 'Market volatility'],
-      sector: 'Exchange Token'
-    },
-    {
-      symbol: 'SOL',
-      name: 'Solana',
-      currentPrice: 67.89,
-      predictedPrice: 78.50,
-      confidence: 70,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 74,
-      factors: ['Network upgrades', 'DeFi ecosystem', 'NFT marketplace'],
-      sector: 'Smart Contracts'
-    },
-    {
-      symbol: 'ADA',
-      name: 'Cardano',
-      currentPrice: 0.47,
-      predictedPrice: 0.52,
-      confidence: 66,
-      timeframe: '7 days',
-      trend: 'bullish',
-      accuracy: 68,
-      factors: ['Smart contracts', 'Governance updates', 'Partnership news'],
-      sector: 'Smart Contracts'
-    }
-  ];
-
-  // Get current market data
-  const getCurrentMarketData = () => {
-    switch (selectedMarket) {
-      case 'indian':
-        return indianPredictions;
-      case 'us':
-        return usPredictions;
-      case 'crypto':
-        return cryptoPredictions;
-      default:
-        return usPredictions;
-    }
-  };
-
-  const predictions = getCurrentMarketData();
   const currentMarket = markets[selectedMarket];
 
-  // Update selected stock when market changes
+  // Handle market change
   const handleMarketChange = (market) => {
     setSelectedMarket(market);
-    const marketData = market === 'indian' ? indianPredictions : 
-                     market === 'us' ? usPredictions : cryptoPredictions;
-    setSelectedStock(marketData[0]?.symbol || 'AAPL');
+    setSelectedStock(markets[market].defaultSymbol);
     setSearchTerm('');
   };
 
-  // Generate sample chart data for predictions
+  // Use selected prediction data if available, otherwise create placeholder
+  const selectedPrediction = selectedPredictionData || allPredictions.find(p => p.symbol === selectedStock) || {
+    symbol: selectedStock,
+    name: 'Loading...',
+    currentPrice: 0,
+    predictedPrice: 0,
+    confidence: 0,
+    trend: 'neutral',
+    accuracy: 0,
+    factors: [],
+    sector: 'N/A',
+    timeframe: '7 days'
+  };
+
+  // Generate chart data for predictions
   const generatePredictionData = (currentPrice, predictedPrice) => {
     const data = [];
     const days = 7;
     const priceChange = predictedPrice - currentPrice;
     const dailyChange = priceChange / days;
-    
+
     for (let i = 0; i <= days; i++) {
       const date = new Date();
       date.setDate(date.getDate() + i);
-      
+
       let price;
       if (i === 0) {
         price = currentPrice;
       } else if (i === days) {
         price = predictedPrice;
       } else {
-        // Add some realistic volatility
         const basePrice = currentPrice + (dailyChange * i);
         const volatility = (Math.random() - 0.5) * (currentPrice * 0.02);
         price = basePrice + volatility;
       }
-      
+
       data.push({
         timestamp: date.toISOString(),
         price: price,
@@ -290,14 +103,15 @@ const PredictionDashboard = () => {
     return data;
   };
 
-  const selectedPrediction = predictions.find(p => p.symbol === selectedStock) || predictions[0];
   const chartData = generatePredictionData(selectedPrediction.currentPrice, selectedPrediction.predictedPrice);
 
-  const filteredPredictions = predictions.filter(prediction =>
-    prediction.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prediction.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter predictions based on search
+  const filteredPredictions = allPredictions.filter(prediction =>
+    prediction.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    prediction.symbol?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Utility functions
   const getConfidenceColor = (confidence) => {
     if (confidence >= 80) return 'text-green-400 bg-green-500/20 border-green-500/30';
     if (confidence >= 60) return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
@@ -317,6 +131,25 @@ const PredictionDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {predictionsError && (
+        <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-red-400 font-semibold">Connection Error</h3>
+            <p className="text-red-300 text-sm mt-1">
+              Unable to connect to prediction service. Please ensure the Flask backend is running on localhost:5000
+            </p>
+            <button
+              onClick={refetchPredictions}
+              className="mt-2 px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header with Market Selection */}
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
         {/* Market Selection Tabs */}
@@ -349,13 +182,20 @@ const PredictionDashboard = () => {
           </div>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <div className="flex items-center space-x-2 text-sm text-gray-400">
-              <div className={`w-2 h-2 bg-${currentMarket.accentColor}-400 rounded-full animate-pulse`}></div>
-              <span>AI Model Active</span>
+              <div className={`w-2 h-2 rounded-full animate-pulse ${predictionsLoading ? 'bg-yellow-400' : 'bg-green-400'}`}></div>
+              <span>{predictionsLoading ? 'Loading...' : 'AI Model Active'}</span>
             </div>
-            <div className="text-sm text-gray-400">Last Updated: 2 min ago</div>
+            <button
+              onClick={refetchPredictions}
+              disabled={predictionsLoading}
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh predictions"
+            >
+              <RefreshCw className={`h-4 w-4 text-gray-400 ${predictionsLoading ? 'animate-spin' : ''}`} />
+            </button>
           </div>
         </div>
-        
+
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -365,13 +205,13 @@ const PredictionDashboard = () => {
               placeholder={`Search ${currentMarket.name.toLowerCase()}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-${currentMarket.accentColor}-500 focus:border-${currentMarket.accentColor}-500 bg-gray-700 text-white placeholder-gray-400`}
+              className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
           <select
             value={predictionPeriod}
             onChange={(e) => setPredictionPeriod(e.target.value)}
-            className={`px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-${currentMarket.accentColor}-500 focus:border-${currentMarket.accentColor}-500 bg-gray-700 text-white`}
+            className="px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
           >
             <option value="1d">1 Day</option>
             <option value="7d">7 Days</option>
@@ -385,31 +225,39 @@ const PredictionDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-white">{selectedPrediction.name}</h3>
-                <p className="text-sm text-gray-400">Price Prediction - {selectedPrediction.timeframe}</p>
+            {selectedLoading ? (
+              <div className="flex items-center justify-center h-80">
+                <Loader className="h-8 w-8 text-blue-400 animate-spin" />
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <p className="text-sm text-gray-400">Current</p>
-                  <p className="text-lg font-semibold text-white">
-                    {currentMarket.currency}{formatPrice(selectedPrediction.currentPrice)}
-                  </p>
+            ) : (
+              <>
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{selectedPrediction.name}</h3>
+                    <p className="text-sm text-gray-400">Price Prediction - {selectedPrediction.timeframe}</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-right">
+                      <p className="text-sm text-gray-400">Current</p>
+                      <p className="text-lg font-semibold text-white">
+                        {currentMarket.currency}{formatPrice(selectedPrediction.currentPrice)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-400">Predicted</p>
+                      <p className={`text-lg font-semibold ${getTrendColor(selectedPrediction.trend)}`}>
+                        {currentMarket.currency}{formatPrice(selectedPrediction.predictedPrice)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-400">Predicted</p>
-                  <p className={`text-lg font-semibold ${getTrendColor(selectedPrediction.trend)}`}>
-                    {currentMarket.currency}{formatPrice(selectedPrediction.predictedPrice)}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <StockChart 
-              data={chartData} 
-              symbol={selectedPrediction.symbol}
-              type="area"
-            />
+                <StockChart
+                  data={chartData}
+                  symbol={selectedPrediction.symbol}
+                  type="area"
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -417,60 +265,71 @@ const PredictionDashboard = () => {
         <div className="space-y-6">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4">Prediction Details</h3>
-            
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Confidence</span>
-                <span className={`px-2 py-1 rounded-full text-sm font-medium border ${getConfidenceColor(selectedPrediction.confidence)}`}>
-                  {selectedPrediction.confidence}%
-                </span>
+
+            {selectedLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader className="h-6 w-6 text-blue-400 animate-spin" />
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Trend</span>
-                <div className={`flex items-center ${getTrendColor(selectedPrediction.trend)}`}>
-                  {selectedPrediction.trend === 'bullish' ? (
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 mr-1" />
-                  )}
-                  <span className="capitalize font-medium">{selectedPrediction.trend}</span>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Confidence</span>
+                  <span className={`px-2 py-1 rounded-full text-sm font-medium border ${getConfidenceColor(selectedPrediction.confidence)}`}>
+                    {selectedPrediction.confidence}%
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Trend</span>
+                  <div className={`flex items-center ${getTrendColor(selectedPrediction.trend)}`}>
+                    {selectedPrediction.trend === 'bullish' ? (
+                      <TrendingUp className="h-4 w-4 mr-1" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 mr-1" />
+                    )}
+                    <span className="capitalize font-medium">{selectedPrediction.trend}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Model Accuracy</span>
+                  <span className="font-medium text-white">{selectedPrediction.accuracy}%</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Price Change</span>
+                  <span className={`font-medium ${getTrendColor(selectedPrediction.trend)}`}>
+                    {selectedPrediction.trend === 'bullish' ? '+' : ''}
+                    {((selectedPrediction.predictedPrice - selectedPrediction.currentPrice) / selectedPrediction.currentPrice * 100).toFixed(2)}%
+                  </span>
                 </div>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Model Accuracy</span>
-                <span className="font-medium text-white">{selectedPrediction.accuracy}%</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Price Change</span>
-                <span className={`font-medium ${getTrendColor(selectedPrediction.trend)}`}>
-                  {selectedPrediction.trend === 'bullish' ? '+' : ''}
-                  {((selectedPrediction.predictedPrice - selectedPrediction.currentPrice) / selectedPrediction.currentPrice * 100).toFixed(2)}%
-                </span>
-              </div>
-            </div>
+            )}
           </div>
 
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4">Key Factors</h3>
-            <div className="space-y-2">
-              {selectedPrediction.factors.map((factor, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 bg-${currentMarket.accentColor}-400 rounded-full`}></div>
-                  <span className="text-sm text-gray-300">{factor}</span>
+            {selectedPrediction.factors && selectedPrediction.factors.length > 0 ? (
+              <>
+                <div className="space-y-2">
+                  {selectedPrediction.factors.map((factor, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span className="text-sm text-gray-300">{factor}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            
-            {/* Market-specific additional info */}
-            <div className="mt-6 pt-4 border-t border-gray-600">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Sector</span>
-                <span className="font-medium text-white">{selectedPrediction.sector}</span>
-              </div>
-            </div>
+
+                <div className="mt-6 pt-4 border-t border-gray-600">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Sector</span>
+                    <span className="font-medium text-white">{selectedPrediction.sector}</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-gray-400 text-sm">No factors available</p>
+            )}
           </div>
         </div>
       </div>
@@ -478,64 +337,72 @@ const PredictionDashboard = () => {
       {/* Predictions List */}
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
         <h2 className="text-xl font-semibold text-white mb-6">All Predictions</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredPredictions.map((prediction) => (
-            <div 
-              key={prediction.symbol}
-              className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
-                selectedStock === prediction.symbol 
-                  ? `border-${currentMarket.accentColor}-500 bg-gray-700` 
-                  : 'border-gray-600 hover:border-gray-500'
-              }`}
-              onClick={() => setSelectedStock(prediction.symbol)}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h4 className="font-semibold text-white">{prediction.symbol}</h4>
-                  <p className="text-sm text-gray-400 truncate">{prediction.name}</p>
-                  <p className="text-xs text-gray-500 mt-1">{prediction.sector}</p>
+
+        {predictionsLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader className="h-8 w-8 text-blue-400 animate-spin mr-3" />
+            <span className="text-gray-400">Loading predictions...</span>
+          </div>
+        ) : filteredPredictions.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPredictions.map((prediction) => (
+              <div
+                key={prediction.symbol}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                  selectedStock === prediction.symbol
+                    ? 'border-blue-500 bg-gray-700'
+                    : 'border-gray-600 hover:border-gray-500'
+                }`}
+                onClick={() => setSelectedStock(prediction.symbol)}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-semibold text-white">{prediction.symbol}</h4>
+                    <p className="text-sm text-gray-400 truncate">{prediction.name}</p>
+                    <p className="text-xs text-gray-500 mt-1">{prediction.sector}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getConfidenceColor(prediction.confidence)}`}>
+                    {prediction.confidence}%
+                  </span>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getConfidenceColor(prediction.confidence)}`}>
-                  {prediction.confidence}%
-                </span>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Current</span>
+                    <span className="text-sm font-medium text-white">
+                      {currentMarket.currency}{formatPrice(prediction.currentPrice)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Predicted</span>
+                    <span className={`text-sm font-medium ${getTrendColor(prediction.trend)}`}>
+                      {currentMarket.currency}{formatPrice(prediction.predictedPrice)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Change</span>
+                    <span className={`text-sm font-medium ${getTrendColor(prediction.trend)}`}>
+                      {prediction.trend === 'bullish' ? '+' : ''}
+                      {((prediction.predictedPrice - prediction.currentPrice) / prediction.currentPrice * 100).toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Current</span>
-                  <span className="text-sm font-medium text-white">
-                    {currentMarket.currency}{formatPrice(prediction.currentPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Predicted</span>
-                  <span className={`text-sm font-medium ${getTrendColor(prediction.trend)}`}>
-                    {currentMarket.currency}{formatPrice(prediction.predictedPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Change</span>
-                  <span className={`text-sm font-medium ${getTrendColor(prediction.trend)}`}>
-                    {prediction.trend === 'bullish' ? '+' : ''}
-                    {((prediction.predictedPrice - prediction.currentPrice) / prediction.currentPrice * 100).toFixed(2)}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* No results message */}
-        {filteredPredictions.length === 0 && (
+            ))}
+          </div>
+        ) : searchTerm ? (
           <div className="text-center py-12">
             <p className="text-gray-400 mb-4">No predictions found matching your search</p>
             <button
               onClick={() => setSearchTerm('')}
-              className={`px-4 py-2 bg-${currentMarket.accentColor}-600 text-white rounded-lg hover:bg-${currentMarket.accentColor}-700 transition-colors`}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Clear Search
             </button>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No predictions available</p>
           </div>
         )}
       </div>
