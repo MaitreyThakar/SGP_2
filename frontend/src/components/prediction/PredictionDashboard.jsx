@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, TrendingDown, Globe, DollarSign, Bitcoin, AlertCircle, RefreshCw, Loader } from 'lucide-react';
+import { Search, TrendingUp, TrendingDown, Globe, DollarSign, Bitcoin, AlertCircle, RefreshCw, Loader, Sparkles, X } from 'lucide-react';
 import StockChart from '../common/StockChart';
 import { usePredictions, usePrediction } from '@/hooks/usePredictions';
+import { useStockSearch } from '@/hooks/useStockSearch';
 
 /**
  * PredictionDashboard component with dark theme
@@ -16,10 +17,22 @@ const PredictionDashboard = () => {
   const [selectedStock, setSelectedStock] = useState('AAPL');
   const [predictionPeriod, setPredictionPeriod] = useState('7d');
   const [searchTerm, setSearchTerm] = useState('');
+  const [customSearchTerm, setCustomSearchTerm] = useState('');
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   // Fetch predictions from backend
   const { predictions: allPredictions, loading: predictionsLoading, error: predictionsError, refetch: refetchPredictions } = usePredictions(selectedMarket, predictionPeriod);
   const { prediction: selectedPredictionData, loading: selectedLoading } = usePrediction(selectedStock, selectedMarket);
+  
+  // Stock search hook
+  const { 
+    searchAndTrain, 
+    training, 
+    searching, 
+    prediction: customPrediction, 
+    error: searchError,
+    reset: resetSearch
+  } = useStockSearch();
 
   // Market configurations
   const markets = {
@@ -56,10 +69,37 @@ const PredictionDashboard = () => {
     setSelectedMarket(market);
     setSelectedStock(markets[market].defaultSymbol);
     setSearchTerm('');
+    resetSearch();
   };
 
-  // Use selected prediction data if available, otherwise create placeholder
-  const selectedPrediction = selectedPredictionData || allPredictions.find(p => p.symbol === selectedStock) || {
+  // Handle custom stock search and prediction
+  const handleCustomSearch = async () => {
+    if (!customSearchTerm.trim()) {
+      return;
+    }
+
+    try {
+      const result = await searchAndTrain(customSearchTerm, selectedMarket, predictionPeriod);
+      if (result && result.prediction) {
+        // Set the custom stock as selected
+        setSelectedStock(result.prediction.symbol);
+        setShowSearchModal(false);
+        setCustomSearchTerm('');
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    }
+  };
+
+  // Handle Enter key in search input
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleCustomSearch();
+    }
+  };
+
+  // Use custom prediction if available, otherwise use selected prediction data
+  const selectedPrediction = customPrediction || selectedPredictionData || allPredictions.find(p => p.symbol === selectedStock) || {
     symbol: selectedStock,
     name: 'Loading...',
     currentPrice: 0,
@@ -208,6 +248,21 @@ const PredictionDashboard = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
+          {(selectedMarket === 'us' || selectedMarket === 'crypto' || selectedMarket === 'indian') && (
+            <button
+              onClick={() => setShowSearchModal(true)}
+              className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${
+                selectedMarket === 'us' 
+                  ? 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                  : selectedMarket === 'crypto'
+                  ? 'from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800'
+                  : 'from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800'
+              } text-white rounded-lg font-medium transition-all duration-200 shadow-lg`}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Search Any {selectedMarket === 'us' ? 'Stock' : selectedMarket === 'crypto' ? 'Crypto' : 'Indian Stock'}</span>
+            </button>
+          )}
           <select
             value={predictionPeriod}
             onChange={(e) => setPredictionPeriod(e.target.value)}
@@ -406,6 +461,132 @@ const PredictionDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Custom Stock Search Modal */}
+      {showSearchModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-blue-400" />
+                Search & Train Model
+              </h3>
+              <button
+                onClick={() => {
+                  setShowSearchModal(false);
+                  setCustomSearchTerm('');
+                  resetSearch();
+                }}
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  {selectedMarket === 'us' 
+                    ? 'Enter US Stock Symbol' 
+                    : selectedMarket === 'crypto'
+                    ? 'Enter Cryptocurrency Symbol'
+                    : 'Enter Indian Stock Symbol'
+                  }
+                </label>
+                <input
+                  type="text"
+                  value={customSearchTerm}
+                  onChange={(e) => setCustomSearchTerm(e.target.value.toUpperCase())}
+                  onKeyPress={handleSearchKeyPress}
+                  placeholder={
+                    selectedMarket === 'us' 
+                      ? 'e.g., AAPL, TSLA, NVDA'
+                      : selectedMarket === 'crypto'
+                      ? 'e.g., BTC-USD, ETH-USD, DOGE-USD'
+                      : 'e.g., RELIANCE.NS, TCS.NS, INFY.NS'
+                  }
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white placeholder-gray-400"
+                  disabled={searching || training}
+                />
+                <p className="text-xs text-gray-400 mt-2">
+                  {selectedMarket === 'us' 
+                    ? "We'll search for the stock, train an LSTM model, and generate a prediction"
+                    : selectedMarket === 'crypto'
+                    ? "We'll search for the cryptocurrency, train an LSTM model, and generate a prediction. Use format: SYMBOL-USD (e.g., BTC-USD)"
+                    : "We'll search for the Indian stock, train an LSTM model, and generate a prediction. Use format: SYMBOL.NS (e.g., RELIANCE.NS)"
+                  }
+                </p>
+              </div>
+
+              {searchError && (
+                <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-300 text-sm">{searchError}</p>
+                </div>
+              )}
+
+              {(searching || training) && (
+                <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <Loader className="h-5 w-5 text-blue-400 animate-spin" />
+                    <div className="flex-1">
+                      <p className="text-blue-300 font-medium">
+                        {searching ? 'Searching for stock...' : 'Training LSTM model...'}
+                      </p>
+                      <p className="text-blue-400 text-sm mt-1">
+                        {training ? 'This may take 30-60 seconds' : 'Please wait'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowSearchModal(false);
+                    setCustomSearchTerm('');
+                    resetSearch();
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
+                  disabled={searching || training}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCustomSearch}
+                  disabled={!customSearchTerm.trim() || searching || training}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {searching || training ? (
+                    <>
+                      <Loader className="h-4 w-4 animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      <span>Train & Predict</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="bg-gray-700/50 rounded-lg p-3 border border-gray-600">
+                <p className="text-xs text-gray-400">
+                  <strong className="text-gray-300">Note:</strong> The model will fetch historical data,
+                  train an LSTM neural network, and generate a 7-day {selectedMarket === 'crypto' ? 'price' : 'price'} prediction with confidence score.
+                  {selectedMarket === 'crypto' && (
+                    <span className="block mt-1">
+                      <strong className="text-yellow-400">Crypto tip:</strong> Always use -USD suffix (e.g., BTC-USD, ETH-USD, DOGE-USD)
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

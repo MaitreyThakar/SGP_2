@@ -339,11 +339,55 @@ def get_sector_from_symbol(symbol, market):
             'ETH-USD': 'Smart Contracts',
             'BNB-USD': 'Exchange Token',
             'SOL-USD': 'Smart Contracts',
-            'ADA-USD': 'Smart Contracts'
+            'ADA-USD': 'Smart Contracts',
+            'XRP-USD': 'Payment Network',
+            'DOGE-USD': 'Meme Coin',
+            'MATIC-USD': 'Layer 2 Scaling',
+            'DOT-USD': 'Interoperability',
+            'AVAX-USD': 'Smart Contracts',
+            'LINK-USD': 'Oracle Network',
+            'UNI-USD': 'DeFi / DEX',
+            'ATOM-USD': 'Interoperability',
+            'LTC-USD': 'Digital Currency',
+            'SHIB-USD': 'Meme Coin'
         }
     }
 
-    return sector_map.get(market, {}).get(symbol, 'Unknown')
+    # Check if symbol exists in map
+    mapped_sector = sector_map.get(market, {}).get(symbol, None)
+    if mapped_sector:
+        return mapped_sector
+    
+    # For crypto, categorize based on common patterns
+    if market == 'crypto':
+        if '-USD' in symbol:
+            # Default categories for crypto
+            if any(x in symbol for x in ['SHIB', 'DOGE', 'FLOKI']):
+                return 'Meme Coin'
+            elif any(x in symbol for x in ['ETH', 'SOL', 'AVAX', 'ADA']):
+                return 'Smart Contracts'
+            elif any(x in symbol for x in ['BTC', 'LTC']):
+                return 'Store of Value'
+            elif any(x in symbol for x in ['USDT', 'USDC', 'DAI']):
+                return 'Stablecoin'
+            else:
+                return 'Cryptocurrency'
+    
+    # Try to fetch from yfinance for unknown symbols
+    try:
+        import yfinance as yf
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        if info and 'sector' in info:
+            return info['sector']
+        elif info and 'industry' in info:
+            return info['industry']
+        elif info and 'category' in info:
+            return info['category']
+    except Exception as e:
+        print(f"Could not fetch sector for {symbol}: {str(e)}")
+    
+    return 'Unknown'
 
 
 def get_company_name(symbol, market):
@@ -368,11 +412,69 @@ def get_company_name(symbol, market):
             'ETH-USD': 'Ethereum',
             'BNB-USD': 'BNB',
             'SOL-USD': 'Solana',
-            'ADA-USD': 'Cardano'
+            'ADA-USD': 'Cardano',
+            'XRP-USD': 'Ripple',
+            'DOGE-USD': 'Dogecoin',
+            'MATIC-USD': 'Polygon',
+            'DOT-USD': 'Polkadot',
+            'AVAX-USD': 'Avalanche',
+            'LINK-USD': 'Chainlink',
+            'UNI-USD': 'Uniswap',
+            'ATOM-USD': 'Cosmos',
+            'LTC-USD': 'Litecoin',
+            'SHIB-USD': 'Shiba Inu'
         }
     }
 
-    return name_map.get(market, {}).get(symbol, symbol)
+    # Check if symbol exists in map
+    mapped_name = name_map.get(market, {}).get(symbol, None)
+    if mapped_name:
+        return mapped_name
+    
+    # For crypto, try to extract name from symbol
+    if market == 'crypto' and '-USD' in symbol:
+        crypto_symbol = symbol.replace('-USD', '')
+        # Common crypto name patterns
+        crypto_names = {
+            'BTC': 'Bitcoin',
+            'ETH': 'Ethereum',
+            'USDT': 'Tether',
+            'USDC': 'USD Coin',
+            'XRP': 'Ripple',
+            'DOGE': 'Dogecoin',
+            'ADA': 'Cardano',
+            'MATIC': 'Polygon',
+            'SOL': 'Solana',
+            'DOT': 'Polkadot',
+            'AVAX': 'Avalanche',
+            'SHIB': 'Shiba Inu',
+            'LINK': 'Chainlink',
+            'UNI': 'Uniswap',
+            'ATOM': 'Cosmos',
+            'LTC': 'Litecoin',
+            'BCH': 'Bitcoin Cash',
+            'XLM': 'Stellar',
+            'ALGO': 'Algorand',
+            'VET': 'VeChain'
+        }
+        if crypto_symbol in crypto_names:
+            return crypto_names[crypto_symbol]
+    
+    # Try to fetch from yfinance for unknown symbols
+    try:
+        import yfinance as yf
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        if info and 'longName' in info:
+            return info['longName']
+        elif info and 'shortName' in info:
+            return info['shortName']
+        elif info and 'name' in info:
+            return info['name']
+    except Exception as e:
+        print(f"Could not fetch company name for {symbol}: {str(e)}")
+    
+    return symbol
 
 
 def calculate_price_change(current, predicted):
